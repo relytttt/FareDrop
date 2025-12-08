@@ -84,12 +84,19 @@ export async function getCheapestTickets(
  * Converts Travelpayouts API response to Deal format
  */
 export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
+  // Format date for Aviasales link (DDMM format)
+  const departureDate = data.found_at ? new Date(data.found_at) : new Date();
+  const dateCode = `${String(departureDate.getDate()).padStart(2, '0')}${String(departureDate.getMonth() + 1).padStart(2, '0')}`;
+  
+  // Generate Aviasales affiliate link
+  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${dateCode}${data.destination}1?marker=direct`;
+  
   return {
     origin: data.origin || '',
     destination: data.destination || '',
     price: data.value || 0,
     departure_date: data.found_at || new Date().toISOString(),
-    affiliate_link: `https://www.aviasales.com/search?origin=${data.origin}&destination=${data.destination}`,
+    affiliate_link: affiliateLink,
   };
 }
 

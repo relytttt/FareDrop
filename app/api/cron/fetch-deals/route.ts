@@ -6,15 +6,17 @@ import { sendBatchDealAlerts } from '@/lib/email';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify cron secret
-    const authHeader = request.headers.get('authorization');
+    // Verify Vercel cron secret
     const cronSecret = process.env.CRON_SECRET;
-
-    if (cronSecret && authHeader !== `Bearer ${cronSecret}`) {
-      return NextResponse.json(
-        { error: 'Unauthorized' },
-        { status: 401 }
-      );
+    
+    if (cronSecret) {
+      const authHeader = request.headers.get('authorization');
+      if (authHeader !== `Bearer ${cronSecret}`) {
+        return NextResponse.json(
+          { error: 'Unauthorized' },
+          { status: 401 }
+        );
+      }
     }
 
     const supabase = getServiceSupabase();
@@ -41,14 +43,14 @@ export async function POST(request: NextRequest) {
             date_from: nextMonth.toISOString().split('T')[0],
             date_to: threeMonthsOut.toISOString().split('T')[0],
             limit: 10,
-            price_to: 500,
+            price_to: 1000,
           });
 
           // Convert and filter good deals
           if (kiwiResults.data && kiwiResults.data.length > 0) {
             for (const flight of kiwiResults.data.slice(0, 5)) {
               const deal = convertKiwiToDeal(flight);
-              if (deal.price && deal.price < 600) {
+              if (deal.price && deal.price < 1000) {
                 newDeals.push({
                   ...deal,
                   deal_score: Math.floor(Math.random() * 30) + 70, // 70-100
@@ -70,7 +72,7 @@ export async function POST(request: NextRequest) {
           if (tpResults.success && tpResults.data && tpResults.data.length > 0) {
             for (const flight of tpResults.data.slice(0, 5)) {
               const deal = convertTravelpayoutsToDeal(flight);
-              if (deal.price && deal.price < 600) {
+              if (deal.price && deal.price < 1000) {
                 newDeals.push({
                   ...deal,
                   airline: 'Various',

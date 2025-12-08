@@ -99,6 +99,9 @@ export const DEPARTURE_CITIES = [
   'Adelaide (ADL)',
   'Gold Coast (OOL)',
   'Cairns (CNS)',
+  'Hobart (HBA)',
+  'Darwin (DRW)',
+  'Canberra (CBR)',
 ] as const;
 
 export type Region = (typeof REGIONS)[number];
