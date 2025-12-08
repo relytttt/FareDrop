@@ -85,7 +85,14 @@ export async function getCheapestTickets(
  */
 export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
   // Format date for Aviasales link (DDMM format)
-  const departureDate = data.found_at ? new Date(data.found_at) : new Date();
+  let departureDate = new Date();
+  if (data.found_at) {
+    const parsedDate = new Date(data.found_at);
+    if (!isNaN(parsedDate.getTime())) {
+      departureDate = parsedDate;
+    }
+  }
+  
   const dateCode = `${String(departureDate.getDate()).padStart(2, '0')}${String(departureDate.getMonth() + 1).padStart(2, '0')}`;
   
   // Generate Aviasales affiliate link
