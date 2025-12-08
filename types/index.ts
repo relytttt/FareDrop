@@ -1,3 +1,4 @@
+// Australian market configuration - FareDrop v1.0
 export interface Deal {
   id: string;
   origin: string;
