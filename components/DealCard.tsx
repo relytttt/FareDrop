@@ -4,9 +4,10 @@ import Link from 'next/link';
 
 interface DealCardProps {
   deal: Deal;
+  variant?: 'default' | 'compact';
 }
 
-export default function DealCard({ deal }: DealCardProps) {
+export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   const discountPercent = deal.original_price
     ? Math.round(((deal.original_price - deal.price) / deal.original_price) * 100)
     : 0;
@@ -14,6 +15,83 @@ export default function DealCard({ deal }: DealCardProps) {
   const departureDate = new Date(deal.departure_date);
   const expiresDate = new Date(deal.expires_at);
   const daysUntilExpiry = Math.ceil((expiresDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+
+  // Compact list view variant
+  if (variant === 'compact') {
+    return (
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+        <div className="p-4">
+          <div className="flex items-center justify-between gap-4">
+            {/* Route Info - Left Side */}
+            <div className="flex items-center gap-3 flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <div className="text-center">
+                  <div className="text-lg font-bold text-gray-800">{deal.origin}</div>
+                  <div className="text-xs text-gray-500 truncate max-w-[80px]">{deal.origin_city}</div>
+                </div>
+                
+                <Plane className="text-primary-500 flex-shrink-0" size={16} />
+                
+                <div className="text-center">
+                  <div className="text-lg font-bold text-gray-800">{deal.destination}</div>
+                  <div className="text-xs text-gray-500 truncate max-w-[80px]">{deal.destination_city}</div>
+                </div>
+              </div>
+
+              {/* Details */}
+              <div className="flex items-center gap-3 text-xs text-gray-600 flex-shrink-0">
+                <span className="font-medium">{deal.airline}</span>
+                <span>
+                  {departureDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                </span>
+                {deal.destination_region && (
+                  <span className="bg-primary-50 text-primary-700 px-2 py-1 rounded font-medium">
+                    {deal.destination_region}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* Price and Actions - Right Side */}
+            <div className="flex items-center gap-4 flex-shrink-0">
+              <div className="text-right">
+                <div className="flex items-baseline gap-2">
+                  <span className="text-2xl font-bold text-accent-600">${deal.price}</span>
+                  {deal.original_price && (
+                    <span className="text-sm text-gray-400 line-through">${deal.original_price}</span>
+                  )}
+                </div>
+                {discountPercent > 0 && (
+                  <span className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold mt-1">
+                    {discountPercent}% OFF
+                  </span>
+                )}
+              </div>
+
+              <div className="flex gap-2">
+                <a
+                  href={deal.affiliate_link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 text-sm"
+                >
+                  Book
+                </a>
+                <Link
+                  href={`/deals/${deal.id}`}
+                  className="px-4 py-2 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-colors duration-200 text-sm"
+                >
+                  Details
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Default tile view variant
 
   return (
     <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">

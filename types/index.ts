@@ -37,10 +37,13 @@ export interface Alert {
 export interface SearchFilters {
   departureCity?: string;
   destinationRegion?: string;
+  destinationCity?: string;
   sortBy?: 'price' | 'date' | 'discount';
   minDiscount?: number;
   maxPrice?: number;
 }
+
+export type ViewMode = 'list' | 'tile';
 
 export interface EmailCaptureData {
   email: string;

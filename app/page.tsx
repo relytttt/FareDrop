@@ -1,12 +1,13 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sparkles, TrendingDown, Globe } from 'lucide-react';
+import { Sparkles, TrendingDown, Globe, LayoutGrid, List } from 'lucide-react';
 import DealGrid from '@/components/DealGrid';
 import SearchFilters from '@/components/SearchFilters';
 import EmailCapture from '@/components/EmailCapture';
 import AlertModal from '@/components/AlertModal';
-import { Deal, SearchFilters as SearchFiltersType } from '@/types';
+import FeaturedDeals from '@/components/FeaturedDeals';
+import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
 import Link from 'next/link';
 
 export default function Home() {
@@ -15,6 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [filters, setFilters] = useState<SearchFiltersType>({});
+  const [viewMode, setViewMode] = useState<ViewMode>('tile');
 
   useEffect(() => {
     fetchDeals();
@@ -51,6 +53,11 @@ export default function Home() {
     // Filter by destination region
     if (filters.destinationRegion && filters.destinationRegion !== 'All Regions') {
       filtered = filtered.filter((deal) => deal.destination_region === filters.destinationRegion);
+    }
+
+    // Filter by destination city
+    if (filters.destinationCity) {
+      filtered = filtered.filter((deal) => deal.destination_city === filters.destinationCity);
     }
 
     // Filter by max price
@@ -151,7 +158,33 @@ export default function Home() {
             </p>
           </div>
 
-          <SearchFilters onFilterChange={setFilters} initialFilters={filters} />
+          <SearchFilters onFilterChange={setFilters} initialFilters={filters} deals={deals} />
+
+          {/* View Toggle Buttons */}
+          <div className="flex gap-2 mb-6">
+            <button 
+              onClick={() => setViewMode('list')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                viewMode === 'list' 
+                  ? 'bg-primary-500 text-white' 
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <List size={18} />
+              List View
+            </button>
+            <button 
+              onClick={() => setViewMode('tile')}
+              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+                viewMode === 'tile' 
+                  ? 'bg-primary-500 text-white' 
+                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+              }`}
+            >
+              <LayoutGrid size={18} />
+              Tile View
+            </button>
+          </div>
 
           {loading ? (
             <div className="text-center py-16">
@@ -160,7 +193,11 @@ export default function Home() {
             </div>
           ) : (
             <>
-              <DealGrid deals={filteredDeals.slice(0, 6)} />
+              {/* Featured Top 3 Deals */}
+              <FeaturedDeals deals={filteredDeals} />
+              
+              {/* All Deals with selected view mode */}
+              <DealGrid deals={filteredDeals.slice(0, 6)} viewMode={viewMode} />
               
               {filteredDeals.length > 6 && (
                 <div className="text-center mt-12">
