@@ -5,14 +5,14 @@ import { LayoutGrid, List } from 'lucide-react';
 import DealGrid from '@/components/DealGrid';
 import SearchFilters from '@/components/SearchFilters';
 import FeaturedDeals from '@/components/FeaturedDeals';
-import { Deal, SearchFilters as SearchFiltersType } from '@/types';
+import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
 
 export default function DealsPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SearchFiltersType>({});
-  const [viewMode, setViewMode] = useState<'list' | 'tile'>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>('tile');
 
   useEffect(() => {
     fetchDeals();

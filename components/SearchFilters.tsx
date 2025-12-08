@@ -45,7 +45,7 @@ export default function SearchFilters({ onFilterChange, initialFilters = {}, dea
         <h2 className="text-2xl font-bold text-gray-800">Filter Deals</h2>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
         {/* Departure City Filter */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
@@ -103,10 +103,7 @@ export default function SearchFilters({ onFilterChange, initialFilters = {}, dea
             ))}
           </select>
         </div>
-      </div>
 
-      {/* Sort By - Now in separate row */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {/* Sort By */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">

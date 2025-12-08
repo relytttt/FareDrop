@@ -7,7 +7,7 @@ import SearchFilters from '@/components/SearchFilters';
 import EmailCapture from '@/components/EmailCapture';
 import AlertModal from '@/components/AlertModal';
 import FeaturedDeals from '@/components/FeaturedDeals';
-import { Deal, SearchFilters as SearchFiltersType } from '@/types';
+import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
 import Link from 'next/link';
 
 export default function Home() {
@@ -16,7 +16,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [filters, setFilters] = useState<SearchFiltersType>({});
-  const [viewMode, setViewMode] = useState<'list' | 'tile'>('list');
+  const [viewMode, setViewMode] = useState<ViewMode>('tile');
 
   useEffect(() => {
     fetchDeals();

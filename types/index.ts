@@ -43,6 +43,8 @@ export interface SearchFilters {
   maxPrice?: number;
 }
 
+export type ViewMode = 'list' | 'tile';
+
 export interface EmailCaptureData {
   email: string;
   departureCity?: string;

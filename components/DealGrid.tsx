@@ -1,10 +1,10 @@
-import { Deal } from '@/types';
+import { Deal, ViewMode } from '@/types';
 import DealCard from './DealCard';
 
 interface DealGridProps {
   deals: Deal[];
   emptyMessage?: string;
-  viewMode?: 'list' | 'tile';
+  viewMode?: ViewMode;
 }
 
 export default function DealGrid({ deals, emptyMessage = "No deals found", viewMode = 'tile' }: DealGridProps) {
