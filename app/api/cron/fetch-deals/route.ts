@@ -24,6 +24,9 @@ export async function POST(request: NextRequest) {
 
     // List of Australian origins to search from
     const origins = ['SYD', 'MEL', 'BNE', 'PER', 'ADL', 'OOL', 'CNS'];
+    
+    // Popular international destinations
+    const popularDestinations = ['DPS', 'NRT', 'HND', 'SIN', 'BKK', 'HKT', 'AKL', 'ZQN', 'FJI', 'NAN', 'LHR', 'LAX', 'HNL', 'SGN', 'HAN', 'KUL', 'MNL', 'ICN', 'TPE', 'HKG'];
 
     // Get dates for search
     const today = new Date();
@@ -33,8 +36,8 @@ export async function POST(request: NextRequest) {
     threeMonthsOut.setMonth(threeMonthsOut.getMonth() + 3);
 
     // Fetch deals from APIs (if configured)
-    for (const origin of origins.slice(0, 3)) {
-      // Limit to 3 origins for now
+    for (const origin of origins) {
+      // Search all Australian origins
       try {
         // Try Kiwi API
         if (process.env.KIWI_API_KEY) {
@@ -43,14 +46,14 @@ export async function POST(request: NextRequest) {
             date_from: nextMonth.toISOString().split('T')[0],
             date_to: threeMonthsOut.toISOString().split('T')[0],
             limit: 10,
-            price_to: 1000,
+            price_to: 1500,
           });
 
           // Convert and filter good deals
           if (kiwiResults.data && kiwiResults.data.length > 0) {
-            for (const flight of kiwiResults.data.slice(0, 5)) {
+            for (const flight of kiwiResults.data.slice(0, 15)) {
               const deal = convertKiwiToDeal(flight);
-              if (deal.price && deal.price < 1000) {
+              if (deal.price && deal.price < 1500) {
                 newDeals.push({
                   ...deal,
                   deal_score: Math.floor(Math.random() * 30) + 70, // 70-100
@@ -70,9 +73,9 @@ export async function POST(request: NextRequest) {
           });
 
           if (tpResults.success && tpResults.data && tpResults.data.length > 0) {
-            for (const flight of tpResults.data.slice(0, 5)) {
+            for (const flight of tpResults.data.slice(0, 15)) {
               const deal = convertTravelpayoutsToDeal(flight);
-              if (deal.price && deal.price < 1000) {
+              if (deal.price && deal.price < 1500) {
                 newDeals.push({
                   ...deal,
                   airline: 'Various',
@@ -95,7 +98,7 @@ export async function POST(request: NextRequest) {
     if (newDeals.length > 0) {
       const { data, error } = await supabase
         .from('deals')
-        .insert(newDeals.slice(0, 20)) // Limit to 20 deals per run
+        .insert(newDeals.slice(0, 100)) // Limit to 100 deals per run
         .select();
 
       if (error) {
