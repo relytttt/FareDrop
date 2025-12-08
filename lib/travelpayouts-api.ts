@@ -96,7 +96,7 @@ export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
   const dateCode = `${String(departureDate.getDate()).padStart(2, '0')}${String(departureDate.getMonth() + 1).padStart(2, '0')}`;
   
   // Generate Aviasales affiliate link
-  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${dateCode}${data.destination}1?marker=direct`;
+  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${dateCode}${data.destination}1?marker=689762`;
   
   return {
     origin: data.origin || '',
