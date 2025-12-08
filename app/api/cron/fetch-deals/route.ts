@@ -25,7 +25,7 @@ export async function POST(request: NextRequest) {
     // List of Australian origins to search from
     const origins = ['SYD', 'MEL', 'BNE', 'PER', 'ADL', 'OOL', 'CNS'];
     
-    // Popular international destinations
+    // Popular international destinations (for future use in targeted route searches)
     const popularDestinations = ['DPS', 'NRT', 'HND', 'SIN', 'BKK', 'HKT', 'AKL', 'ZQN', 'FJI', 'NAN', 'LHR', 'LAX', 'HNL', 'SGN', 'HAN', 'KUL', 'MNL', 'ICN', 'TPE', 'HKG'];
 
     // Get dates for search
