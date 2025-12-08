@@ -106,18 +106,18 @@ CREATE POLICY "Alerts are viewable by subscriber"
     ON alerts FOR SELECT
     USING (true);
 
--- Insert sample/mock data for initial display
+-- Insert sample/mock data for initial display (Australian-focused deals)
 INSERT INTO deals (origin, destination, origin_city, destination_city, destination_region, price, original_price, airline, departure_date, return_date, deal_score, affiliate_link, expires_at, trip_type)
 VALUES
-    ('JFK', 'LHR', 'New York', 'London', 'Europe', 289.00, 650.00, 'British Airways', NOW() + INTERVAL '30 days', NOW() + INTERVAL '37 days', 85, 'https://example.com/deal/1', NOW() + INTERVAL '7 days', 'round-trip'),
-    ('LAX', 'NRT', 'Los Angeles', 'Tokyo', 'Asia', 425.00, 890.00, 'ANA', NOW() + INTERVAL '45 days', NOW() + INTERVAL '60 days', 92, 'https://example.com/deal/2', NOW() + INTERVAL '5 days', 'round-trip'),
-    ('MIA', 'CUN', 'Miami', 'Cancun', 'Caribbean', 149.00, 320.00, 'American Airlines', NOW() + INTERVAL '21 days', NOW() + INTERVAL '28 days', 78, 'https://example.com/deal/3', NOW() + INTERVAL '10 days', 'round-trip'),
-    ('ORD', 'CDG', 'Chicago', 'Paris', 'Europe', 315.00, 720.00, 'Air France', NOW() + INTERVAL '40 days', NOW() + INTERVAL '49 days', 88, 'https://example.com/deal/4', NOW() + INTERVAL '6 days', 'round-trip'),
-    ('SFO', 'SYD', 'San Francisco', 'Sydney', 'Oceania', 599.00, 1200.00, 'Qantas', NOW() + INTERVAL '60 days', NOW() + INTERVAL '75 days', 90, 'https://example.com/deal/5', NOW() + INTERVAL '8 days', 'round-trip'),
-    ('BOS', 'BCN', 'Boston', 'Barcelona', 'Europe', 275.00, 595.00, 'Iberia', NOW() + INTERVAL '35 days', NOW() + INTERVAL '42 days', 83, 'https://example.com/deal/6', NOW() + INTERVAL '9 days', 'round-trip'),
-    ('SEA', 'HNL', 'Seattle', 'Honolulu', 'North America', 189.00, 425.00, 'Alaska Airlines', NOW() + INTERVAL '28 days', NOW() + INTERVAL '35 days', 75, 'https://example.com/deal/7', NOW() + INTERVAL '12 days', 'round-trip'),
-    ('IAD', 'DXB', 'Washington DC', 'Dubai', 'Middle East', 499.00, 950.00, 'Emirates', NOW() + INTERVAL '50 days', NOW() + INTERVAL '64 days', 87, 'https://example.com/deal/8', NOW() + INTERVAL '7 days', 'round-trip'),
-    ('ATL', 'LIM', 'Atlanta', 'Lima', 'South America', 329.00, 680.00, 'LATAM', NOW() + INTERVAL '38 days', NOW() + INTERVAL '45 days', 81, 'https://example.com/deal/9', NOW() + INTERVAL '6 days', 'round-trip'),
-    ('DFW', 'AMS', 'Dallas', 'Amsterdam', 'Europe', 345.00, 740.00, 'KLM', NOW() + INTERVAL '42 days', NOW() + INTERVAL '49 days', 84, 'https://example.com/deal/10', NOW() + INTERVAL '8 days', 'round-trip'),
-    ('JFK', 'FCO', 'New York', 'Rome', 'Europe', 298.00, 665.00, 'Alitalia', NOW() + INTERVAL '33 days', NOW() + INTERVAL '40 days', 86, 'https://example.com/deal/11', NOW() + INTERVAL '5 days', 'round-trip'),
-    ('LAX', 'BKK', 'Los Angeles', 'Bangkok', 'Asia', 449.00, 920.00, 'Thai Airways', NOW() + INTERVAL '55 days', NOW() + INTERVAL '70 days', 89, 'https://example.com/deal/12', NOW() + INTERVAL '11 days', 'round-trip');
+    ('SYD', 'DPS', 'Sydney', 'Bali', 'Asia', 299.00, 650.00, 'Jetstar', NOW() + INTERVAL '30 days', NOW() + INTERVAL '37 days', 78, 'https://example.com/deal/1', NOW() + INTERVAL '7 days', 'round-trip'),
+    ('MEL', 'NRT', 'Melbourne', 'Tokyo', 'Asia', 599.00, 1400.00, 'Qantas', NOW() + INTERVAL '45 days', NOW() + INTERVAL '60 days', 92, 'https://example.com/deal/2', NOW() + INTERVAL '5 days', 'round-trip'),
+    ('BNE', 'SIN', 'Brisbane', 'Singapore', 'Asia', 349.00, 750.00, 'Singapore Airlines', NOW() + INTERVAL '21 days', NOW() + INTERVAL '28 days', 85, 'https://example.com/deal/3', NOW() + INTERVAL '10 days', 'round-trip'),
+    ('SYD', 'LHR', 'Sydney', 'London', 'Europe', 899.00, 2100.00, 'Emirates', NOW() + INTERVAL '40 days', NOW() + INTERVAL '49 days', 88, 'https://example.com/deal/4', NOW() + INTERVAL '6 days', 'round-trip'),
+    ('PER', 'HKT', 'Perth', 'Phuket', 'Asia', 279.00, 620.00, 'AirAsia X', NOW() + INTERVAL '60 days', NOW() + INTERVAL '75 days', 82, 'https://example.com/deal/5', NOW() + INTERVAL '8 days', 'round-trip'),
+    ('MEL', 'AKL', 'Melbourne', 'Auckland', 'New Zealand', 199.00, 450.00, 'Air New Zealand', NOW() + INTERVAL '35 days', NOW() + INTERVAL '42 days', 75, 'https://example.com/deal/6', NOW() + INTERVAL '9 days', 'round-trip'),
+    ('SYD', 'LAX', 'Sydney', 'Los Angeles', 'North America', 749.00, 1600.00, 'United Airlines', NOW() + INTERVAL '28 days', NOW() + INTERVAL '35 days', 86, 'https://example.com/deal/7', NOW() + INTERVAL '12 days', 'round-trip'),
+    ('BNE', 'NAN', 'Brisbane', 'Fiji', 'Pacific Islands', 329.00, 680.00, 'Fiji Airways', NOW() + INTERVAL '50 days', NOW() + INTERVAL '64 days', 80, 'https://example.com/deal/8', NOW() + INTERVAL '7 days', 'round-trip'),
+    ('ADL', 'SGN', 'Adelaide', 'Ho Chi Minh City', 'Asia', 399.00, 850.00, 'Vietnam Airlines', NOW() + INTERVAL '38 days', NOW() + INTERVAL '45 days', 83, 'https://example.com/deal/9', NOW() + INTERVAL '6 days', 'round-trip'),
+    ('OOL', 'NRT', 'Gold Coast', 'Tokyo', 'Asia', 549.00, 1300.00, 'Jetstar', NOW() + INTERVAL '42 days', NOW() + INTERVAL '49 days', 87, 'https://example.com/deal/10', NOW() + INTERVAL '8 days', 'round-trip'),
+    ('SYD', 'HNL', 'Sydney', 'Honolulu', 'North America', 499.00, 1100.00, 'Hawaiian Airlines', NOW() + INTERVAL '33 days', NOW() + INTERVAL '40 days', 84, 'https://example.com/deal/11', NOW() + INTERVAL '5 days', 'round-trip'),
+    ('MEL', 'BCN', 'Melbourne', 'Barcelona', 'Europe', 949.00, 2200.00, 'Qatar Airways', NOW() + INTERVAL '55 days', NOW() + INTERVAL '70 days', 89, 'https://example.com/deal/12', NOW() + INTERVAL '11 days', 'round-trip');
