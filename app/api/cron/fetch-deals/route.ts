@@ -20,8 +20,8 @@ export async function POST(request: NextRequest) {
     const supabase = getServiceSupabase();
     const newDeals: any[] = [];
 
-    // List of origins to search from
-    const origins = ['JFK', 'LAX', 'ORD', 'SFO', 'MIA', 'BOS', 'SEA', 'IAD', 'ATL', 'DFW'];
+    // List of Australian origins to search from
+    const origins = ['SYD', 'MEL', 'BNE', 'PER', 'ADL', 'OOL', 'CNS'];
 
     // Get dates for search
     const today = new Date();

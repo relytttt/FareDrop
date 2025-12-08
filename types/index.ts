@@ -80,28 +80,25 @@ export interface TravelpayoutsFlightData {
 
 export const REGIONS = [
   'All Regions',
-  'Europe',
   'Asia',
+  'Pacific Islands',
+  'New Zealand',
+  'Europe',
   'North America',
-  'South America',
-  'Caribbean',
-  'Africa',
-  'Oceania',
   'Middle East',
+  'Africa',
+  'South America',
 ] as const;
 
 export const DEPARTURE_CITIES = [
   'All Cities',
-  'New York (NYC)',
-  'Los Angeles (LAX)',
-  'Chicago (ORD)',
-  'San Francisco (SFO)',
-  'Miami (MIA)',
-  'Boston (BOS)',
-  'Seattle (SEA)',
-  'Washington DC (IAD)',
-  'Atlanta (ATL)',
-  'Dallas (DFW)',
+  'Sydney (SYD)',
+  'Melbourne (MEL)',
+  'Brisbane (BNE)',
+  'Perth (PER)',
+  'Adelaide (ADL)',
+  'Gold Coast (OOL)',
+  'Cairns (CNS)',
 ] as const;
 
 export type Region = (typeof REGIONS)[number];

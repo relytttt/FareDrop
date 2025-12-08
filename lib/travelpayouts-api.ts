@@ -27,7 +27,7 @@ export async function searchCheapFlights(
 
   const queryParams = new URLSearchParams({
     token: TRAVELPAYOUTS_API_KEY,
-    currency: params.currency || 'USD',
+    currency: params.currency || 'AUD',
     origin: params.origin,
     beginning_of_period: params.beginning_of_period,
   });
