@@ -2,32 +2,21 @@ import { notFound } from 'next/navigation';
 import { Plane, Calendar, MapPin, TrendingDown, ExternalLink } from 'lucide-react';
 import PriceDisplay from '@/components/PriceDisplay';
 import Link from 'next/link';
+import { supabase } from '@/lib/supabase';
 
-// This would normally fetch from API/database
+// Fetch deal from database
 async function getDeal(id: string) {
-  // Mock data for now - in production, fetch from Supabase
-  const mockDeals = [
-    {
-      id: '1',
-      origin: 'JFK',
-      destination: 'LHR',
-      origin_city: 'New York',
-      destination_city: 'London',
-      destination_region: 'Europe',
-      price: 289,
-      original_price: 650,
-      airline: 'British Airways',
-      departure_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      return_date: new Date(Date.now() + 37 * 24 * 60 * 60 * 1000).toISOString(),
-      deal_score: 85,
-      affiliate_link: 'https://example.com/deal/1',
-      expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
-      created_at: new Date().toISOString(),
-      trip_type: 'round-trip' as const,
-    },
-  ];
+  const { data, error } = await supabase
+    .from('deals')
+    .select('*')
+    .eq('id', id)
+    .single();
 
-  return mockDeals.find((d) => d.id === id);
+  if (error || !data) {
+    return null;
+  }
+
+  return data;
 }
 
 export default async function DealDetailsPage({ params }: { params: { id: string } }) {
