@@ -1,8 +1,10 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { LayoutGrid, List } from 'lucide-react';
 import DealGrid from '@/components/DealGrid';
 import SearchFilters from '@/components/SearchFilters';
+import FeaturedDeals from '@/components/FeaturedDeals';
 import { Deal, SearchFilters as SearchFiltersType } from '@/types';
 
 export default function DealsPage() {
@@ -10,6 +12,7 @@ export default function DealsPage() {
   const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SearchFiltersType>({});
+  const [viewMode, setViewMode] = useState<'list' | 'tile'>('list');
 
   useEffect(() => {
     fetchDeals();
@@ -44,6 +47,10 @@ export default function DealsPage() {
 
     if (filters.destinationRegion && filters.destinationRegion !== 'All Regions') {
       filtered = filtered.filter((deal) => deal.destination_region === filters.destinationRegion);
+    }
+
+    if (filters.destinationCity) {
+      filtered = filtered.filter((deal) => deal.destination_city === filters.destinationCity);
     }
 
     if (filters.maxPrice) {
@@ -89,7 +96,33 @@ export default function DealsPage() {
           </p>
         </div>
 
-        <SearchFilters onFilterChange={setFilters} initialFilters={filters} />
+        <SearchFilters onFilterChange={setFilters} initialFilters={filters} deals={deals} />
+
+        {/* View Toggle Buttons */}
+        <div className="flex gap-2 mb-6">
+          <button 
+            onClick={() => setViewMode('list')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              viewMode === 'list' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <List size={18} />
+            List View
+          </button>
+          <button 
+            onClick={() => setViewMode('tile')}
+            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
+              viewMode === 'tile' 
+                ? 'bg-primary-500 text-white' 
+                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
+            }`}
+          >
+            <LayoutGrid size={18} />
+            Tile View
+          </button>
+        </div>
 
         {loading ? (
           <div className="text-center py-16">
@@ -97,7 +130,13 @@ export default function DealsPage() {
             <p className="mt-4 text-gray-600">Loading deals...</p>
           </div>
         ) : (
-          <DealGrid deals={filteredDeals} emptyMessage="No deals match your filters" />
+          <>
+            {/* Featured Top 3 Deals */}
+            <FeaturedDeals deals={filteredDeals} />
+            
+            {/* All Deals with selected view mode */}
+            <DealGrid deals={filteredDeals} emptyMessage="No deals match your filters" viewMode={viewMode} />
+          </>
         )}
       </div>
     </div>

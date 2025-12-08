@@ -2,15 +2,25 @@
 
 import { useState } from 'react';
 import { Search, MapPin, Globe, SortAsc } from 'lucide-react';
-import { SearchFilters as SearchFiltersType, DEPARTURE_CITIES, REGIONS } from '@/types';
+import { SearchFilters as SearchFiltersType, DEPARTURE_CITIES, REGIONS, Deal } from '@/types';
 
 interface SearchFiltersProps {
   onFilterChange: (filters: SearchFiltersType) => void;
   initialFilters?: SearchFiltersType;
+  deals?: Deal[];
 }
 
-export default function SearchFilters({ onFilterChange, initialFilters = {} }: SearchFiltersProps) {
+export default function SearchFilters({ onFilterChange, initialFilters = {}, deals = [] }: SearchFiltersProps) {
   const [filters, setFilters] = useState<SearchFiltersType>(initialFilters);
+
+  // Extract unique destination cities from deals
+  const destinationCities = Array.from(
+    new Set(
+      deals
+        .map((deal) => deal.destination_city)
+        .filter((city): city is string => !!city)
+    )
+  ).sort();
 
   const handleFilterChange = (key: keyof SearchFiltersType, value: any) => {
     const newFilters = { ...filters, [key]: value };
@@ -74,6 +84,29 @@ export default function SearchFilters({ onFilterChange, initialFilters = {} }: S
           </select>
         </div>
 
+        {/* Destination City Filter */}
+        <div>
+          <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
+            <MapPin size={16} className="text-accent-500" />
+            Destination City
+          </label>
+          <select
+            value={filters.destinationCity || ''}
+            onChange={(e) => handleFilterChange('destinationCity', e.target.value || undefined)}
+            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent outline-none"
+          >
+            <option value="">All Destinations</option>
+            {destinationCities.map((city) => (
+              <option key={city} value={city}>
+                {city}
+              </option>
+            ))}
+          </select>
+        </div>
+      </div>
+
+      {/* Sort By - Now in separate row */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
         {/* Sort By */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
