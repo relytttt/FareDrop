@@ -18,7 +18,7 @@ export default function FeaturedDeals({ deals }: FeaturedDealsProps) {
 
   return (
     <div className="mb-8">
-      <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2">
+      <h2 className="text-2xl font-bold text-gray-900 mb-4 flex items-center gap-2" aria-label="Top Deals">
         🔥 Top Deals
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

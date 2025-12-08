@@ -87,7 +87,7 @@ export default function SearchFilters({ onFilterChange, initialFilters = {}, dea
         {/* Destination City Filter */}
         <div>
           <label className="flex items-center gap-2 text-sm font-medium text-gray-700 mb-2">
-            <MapPin size={16} className="text-accent-500" />
+            <MapPin size={16} className="text-primary-500" />
             Destination City
           </label>
           <select
