@@ -3,6 +3,93 @@ import { Deal, TravelpayoutsApiResponse } from '@/types';
 const TRAVELPAYOUTS_API_KEY = process.env.TRAVELPAYOUTS_API_KEY;
 const TRAVELPAYOUTS_API_BASE_URL = 'https://api.travelpayouts.com/v2';
 
+const AIRPORT_TO_CITY: Record<string, string> = {
+  // Australian Origins
+  'SYD': 'Sydney',
+  'MEL': 'Melbourne', 
+  'BNE': 'Brisbane',
+  'PER': 'Perth',
+  'ADL': 'Adelaide',
+  'OOL': 'Gold Coast',
+  'CNS': 'Cairns',
+  'HBA': 'Hobart',
+  'DRW': 'Darwin',
+  'CBR': 'Canberra',
+  // Asia
+  'DPS': 'Bali',
+  'CGK': 'Jakarta',
+  'SIN': 'Singapore',
+  'BKK': 'Bangkok',
+  'HKT': 'Phuket',
+  'NRT': 'Tokyo',
+  'HND': 'Tokyo',
+  'KIX': 'Osaka',
+  'HKG': 'Hong Kong',
+  'ICN': 'Seoul',
+  'TPE': 'Taipei',
+  'MNL': 'Manila',
+  'SGN': 'Ho Chi Minh City',
+  'HAN': 'Hanoi',
+  'KUL': 'Kuala Lumpur',
+  'PVG': 'Shanghai',
+  'PEK': 'Beijing',
+  // Pacific Islands
+  'NAN': 'Fiji',
+  'APW': 'Samoa',
+  'VLI': 'Vanuatu',
+  'PPT': 'Tahiti',
+  'RAR': 'Rarotonga',
+  // New Zealand
+  'AKL': 'Auckland',
+  'ZQN': 'Queenstown',
+  'WLG': 'Wellington',
+  'CHC': 'Christchurch',
+  // Europe
+  'LHR': 'London',
+  'CDG': 'Paris',
+  'FCO': 'Rome',
+  'BCN': 'Barcelona',
+  'AMS': 'Amsterdam',
+  'FRA': 'Frankfurt',
+  // North America
+  'LAX': 'Los Angeles',
+  'SFO': 'San Francisco',
+  'JFK': 'New York',
+  'HNL': 'Honolulu',
+  'YVR': 'Vancouver',
+  // Middle East
+  'DXB': 'Dubai',
+  'DOH': 'Doha',
+  'AUH': 'Abu Dhabi',
+  // Africa
+  'JNB': 'Johannesburg',
+  'CPT': 'Cape Town',
+  'MRU': 'Mauritius',
+};
+
+const AIRPORT_TO_REGION: Record<string, string> = {
+  // Asia
+  'DPS': 'Asia', 'CGK': 'Asia', 'SIN': 'Asia', 'BKK': 'Asia', 'HKT': 'Asia',
+  'NRT': 'Asia', 'HND': 'Asia', 'KIX': 'Asia', 'HKG': 'Asia', 'ICN': 'Asia',
+  'TPE': 'Asia', 'MNL': 'Asia', 'SGN': 'Asia', 'HAN': 'Asia', 'KUL': 'Asia',
+  'PVG': 'Asia', 'PEK': 'Asia',
+  // Pacific Islands
+  'NAN': 'Pacific Islands', 'APW': 'Pacific Islands', 'VLI': 'Pacific Islands',
+  'PPT': 'Pacific Islands', 'RAR': 'Pacific Islands',
+  // New Zealand
+  'AKL': 'New Zealand', 'ZQN': 'New Zealand', 'WLG': 'New Zealand', 'CHC': 'New Zealand',
+  // Europe
+  'LHR': 'Europe', 'CDG': 'Europe', 'FCO': 'Europe', 'BCN': 'Europe',
+  'AMS': 'Europe', 'FRA': 'Europe',
+  // North America
+  'LAX': 'North America', 'SFO': 'North America', 'JFK': 'North America',
+  'HNL': 'North America', 'YVR': 'North America',
+  // Middle East
+  'DXB': 'Middle East', 'DOH': 'Middle East', 'AUH': 'Middle East',
+  // Africa
+  'JNB': 'Africa', 'CPT': 'Africa', 'MRU': 'Africa',
+};
+
 export interface TravelpayoutsSearchParams {
   origin: string;
   destination?: string;
@@ -98,9 +185,17 @@ export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
   // Generate Aviasales affiliate link
   const affiliateLink = `https://www.aviasales.com/search/${data.origin}${dateCode}${data.destination}1?marker=689762`;
   
+  // Look up city names and region
+  const originCity = AIRPORT_TO_CITY[data.origin] || data.origin;
+  const destinationCity = AIRPORT_TO_CITY[data.destination] || data.destination;
+  const destinationRegion = AIRPORT_TO_REGION[data.destination] || 'Other';
+  
   return {
     origin: data.origin || '',
     destination: data.destination || '',
+    origin_city: originCity,
+    destination_city: destinationCity,
+    destination_region: destinationRegion,
     price: data.value || 0,
     departure_date: data.found_at || new Date().toISOString(),
     affiliate_link: affiliateLink,
