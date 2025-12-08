@@ -1,0 +1,108 @@
+export interface Deal {
+  id: string;
+  origin: string;
+  destination: string;
+  price: number;
+  original_price: number | null;
+  airline: string;
+  departure_date: string;
+  return_date: string | null;
+  deal_score: number;
+  affiliate_link: string;
+  created_at: string;
+  expires_at: string;
+  origin_city?: string;
+  destination_city?: string;
+  destination_region?: string;
+  trip_type?: 'one-way' | 'round-trip';
+}
+
+export interface Subscriber {
+  id: string;
+  email: string;
+  departure_city: string | null;
+  destinations: string[] | null;
+  created_at: string;
+  verified: boolean;
+}
+
+export interface Alert {
+  id: string;
+  subscriber_id: string;
+  deal_id: string;
+  sent_at: string;
+}
+
+export interface SearchFilters {
+  departureCity?: string;
+  destinationRegion?: string;
+  sortBy?: 'price' | 'date' | 'discount';
+  minDiscount?: number;
+  maxPrice?: number;
+}
+
+export interface EmailCaptureData {
+  email: string;
+  departureCity?: string;
+  destinations?: string[];
+}
+
+export interface KiwiApiResponse {
+  data: KiwiFlightData[];
+}
+
+export interface KiwiFlightData {
+  id: string;
+  cityFrom: string;
+  cityTo: string;
+  price: number;
+  airlines: string[];
+  route: Array<{
+    local_departure: string;
+    local_arrival: string;
+  }>;
+  deep_link: string;
+}
+
+export interface TravelpayoutsApiResponse {
+  success: boolean;
+  data: TravelpayoutsFlightData[];
+}
+
+export interface TravelpayoutsFlightData {
+  origin: string;
+  destination: string;
+  value: number;
+  found_at: string;
+  distance: number;
+  actual: boolean;
+}
+
+export const REGIONS = [
+  'All Regions',
+  'Europe',
+  'Asia',
+  'North America',
+  'South America',
+  'Caribbean',
+  'Africa',
+  'Oceania',
+  'Middle East',
+] as const;
+
+export const DEPARTURE_CITIES = [
+  'All Cities',
+  'New York (NYC)',
+  'Los Angeles (LAX)',
+  'Chicago (ORD)',
+  'San Francisco (SFO)',
+  'Miami (MIA)',
+  'Boston (BOS)',
+  'Seattle (SEA)',
+  'Washington DC (IAD)',
+  'Atlanta (ATL)',
+  'Dallas (DFW)',
+] as const;
+
+export type Region = (typeof REGIONS)[number];
+export type DepartureCity = (typeof DEPARTURE_CITIES)[number];
