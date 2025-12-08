@@ -1,7 +1,7 @@
 import { Resend } from 'resend';
 import { Deal, Subscriber } from '@/types';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+const resend = new Resend(process.env.RESEND_API_KEY || 'placeholder-key');
 
 export interface SendDealAlertParams {
   subscriber: Subscriber;
