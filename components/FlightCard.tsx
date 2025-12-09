@@ -1,7 +1,7 @@
 'use client';
 
 import { DuffelOffer } from '@/types';
-import { format } from 'date-fns';
+import { format, isValid, parseISO } from 'date-fns';
 import { Clock, Plane } from 'lucide-react';
 import Link from 'next/link';
 
@@ -16,6 +16,19 @@ interface FlightCardProps {
     infants?: string;
   };
 }
+
+// Safe date formatter - returns fallback if date is invalid
+const safeFormatDate = (dateString: string | null | undefined, formatStr: string, fallback: string = '--:--'): string => {
+  if (!dateString) return fallback;
+  
+  try {
+    const date = parseISO(dateString);
+    if (!isValid(date)) return fallback;
+    return format(date, formatStr);
+  } catch {
+    return fallback;
+  }
+};
 
 export default function FlightCard({ offer, searchParams }: FlightCardProps) {
   const formatDuration = (duration: string) => {
@@ -60,14 +73,14 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
       </div>
 
       {/* Flight details for each slice */}
-      {offer.slices.map((slice, index) => (
+      {offer.slices?.map((slice, index) => (
         <div key={slice.id} className={`${index > 0 ? 'mt-4 pt-4 border-t border-gray-200' : ''}`}>
           <div className="flex justify-between items-center mb-2">
             {/* Route */}
             <div className="flex items-center gap-4 flex-1">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  {format(new Date(slice.departure_time), 'HH:mm')}
+                  {safeFormatDate(slice.departure_time, 'HH:mm')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.origin.iata_code}</div>
               </div>
@@ -89,7 +102,7 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  {format(new Date(slice.arrival_time), 'HH:mm')}
+                  {safeFormatDate(slice.arrival_time, 'HH:mm')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.destination.iata_code}</div>
               </div>

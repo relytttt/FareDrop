@@ -6,6 +6,7 @@ import FlightCard from '@/components/FlightCard';
 import FlightSearch from '@/components/FlightSearch';
 import { DuffelOffer } from '@/types';
 import { ArrowUpDown, Filter } from 'lucide-react';
+import { parseISO, isValid } from 'date-fns';
 
 function FlightsContent() {
   const searchParams = useSearchParams();
@@ -13,6 +14,17 @@ function FlightsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'price' | 'duration' | 'departure'>('price');
+
+  // Helper to safely parse date strings and return timestamp
+  const getSafeTimestamp = (dateString: string | null | undefined): number => {
+    if (!dateString) return 0;
+    try {
+      const date = parseISO(dateString);
+      return isValid(date) ? date.getTime() : 0;
+    } catch {
+      return 0;
+    }
+  };
 
   useEffect(() => {
     searchFlights();
@@ -59,9 +71,11 @@ function FlightsContent() {
       case 'price':
         return parseFloat(a.display_price || a.total_amount) - parseFloat(b.display_price || b.total_amount);
       case 'duration':
-        return a.slices[0].duration.localeCompare(b.slices[0].duration);
+        return (a.slices?.[0]?.duration || '').localeCompare(b.slices?.[0]?.duration || '');
       case 'departure':
-        return new Date(a.slices[0].departure_time).getTime() - new Date(b.slices[0].departure_time).getTime();
+        const dateA = getSafeTimestamp(a.slices?.[0]?.departure_time);
+        const dateB = getSafeTimestamp(b.slices?.[0]?.departure_time);
+        return dateA - dateB;
       default:
         return 0;
     }
