@@ -80,6 +80,9 @@ export interface TravelpayoutsFlightData {
   found_at: string;
   distance: number;
   actual: boolean;
+  depart_date?: string;
+  departure_at?: string;
+  return_date?: string;
 }
 
 export const REGIONS = [

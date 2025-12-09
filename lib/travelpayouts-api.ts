@@ -1,7 +1,12 @@
-import { Deal, TravelpayoutsApiResponse } from '@/types';
+import { Deal, TravelpayoutsApiResponse, TravelpayoutsFlightData } from '@/types';
 
 const TRAVELPAYOUTS_API_KEY = process.env.TRAVELPAYOUTS_API_KEY;
 const TRAVELPAYOUTS_API_BASE_URL = 'https://api.travelpayouts.com/v2';
+
+// Affiliate link configuration
+const AVIASALES_AFFILIATE_MARKER = '689762';
+const DEFAULT_PASSENGERS = 1;
+const DEFAULT_RETURN_DAYS = 7; // Default days for round trip return
 
 const AIRPORT_TO_CITY: Record<string, string> = {
   // Australian Origins
@@ -170,20 +175,45 @@ export async function getCheapestTickets(
 /**
  * Converts Travelpayouts API response to Deal format
  */
-export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
-  // Format date for Aviasales link (DDMM format)
+export function convertTravelpayoutsToDeal(data: TravelpayoutsFlightData): Partial<Deal> {
+  // Use the actual departure date from the API response
   let departureDate = new Date();
-  if (data.found_at) {
+  if (data.depart_date) {
+    const parsedDate = new Date(data.depart_date);
+    if (!isNaN(parsedDate.getTime())) {
+      departureDate = parsedDate;
+    }
+  } else if (data.departure_at) {
+    const parsedDate = new Date(data.departure_at);
+    if (!isNaN(parsedDate.getTime())) {
+      departureDate = parsedDate;
+    }
+  } else if (data.found_at) {
+    // Fallback to found_at if no departure date is available
     const parsedDate = new Date(data.found_at);
     if (!isNaN(parsedDate.getTime())) {
       departureDate = parsedDate;
     }
   }
   
-  const dateCode = `${String(departureDate.getDate()).padStart(2, '0')}${String(departureDate.getMonth() + 1).padStart(2, '0')}`;
+  // Calculate return date (default 7 days later for round trip)
+  // Note: setDate() correctly handles month/year boundaries
+  const returnDate = new Date(departureDate);
+  returnDate.setDate(returnDate.getDate() + DEFAULT_RETURN_DAYS);
   
-  // Generate Aviasales affiliate link
-  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${dateCode}${data.destination}1?marker=689762`;
+  // Format dates as DDMM for Aviasales
+  const formatDate = (date: Date) => {
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    return `${day}${month}`;
+  };
+  
+  const departCode = formatDate(departureDate);
+  const returnCode = formatDate(returnDate);
+  
+  // Generate proper Aviasales affiliate link
+  // Format: /search/{origin}{departDate}{destination}{returnDate}{passengers}
+  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${departCode}${data.destination}${returnCode}${DEFAULT_PASSENGERS}?marker=${AVIASALES_AFFILIATE_MARKER}`;
   
   // Look up city names and region
   const originCity = AIRPORT_TO_CITY[data.origin] || data.origin;
@@ -197,7 +227,7 @@ export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
     destination_city: destinationCity,
     destination_region: destinationRegion,
     price: data.value || 0,
-    departure_date: data.found_at || new Date().toISOString(),
+    departure_date: departureDate.toISOString(),
     affiliate_link: affiliateLink,
   };
 }
