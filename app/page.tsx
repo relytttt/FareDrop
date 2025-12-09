@@ -7,6 +7,7 @@ import SearchFilters from '@/components/SearchFilters';
 import EmailCapture from '@/components/EmailCapture';
 import AlertModal from '@/components/AlertModal';
 import FeaturedDeals from '@/components/FeaturedDeals';
+import TripUpsells from '@/components/TripUpsells';
 import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
 import Link from 'next/link';
 
@@ -209,6 +210,14 @@ export default function Home() {
                   </Link>
                 </div>
               )}
+
+              {/* Trip Upsells Section */}
+              <div className="mt-12">
+                <TripUpsells 
+                  destination={filters.destinationCity ? filteredDeals[0]?.destination : undefined}
+                  destinationCity={filters.destinationCity || (filteredDeals.length > 0 ? filteredDeals[0]?.destination_city : undefined)}
+                />
+              </div>
             </>
           )}
         </div>
