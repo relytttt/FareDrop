@@ -15,7 +15,7 @@ export default function BookingPage() {
   const router = useRouter();
   const offerId = params.offerId as string;
 
-  const [offer, setOffer] = useState<DuffelOffer | null>(null);
+  const [offer, setOffer] = useState<(DuffelOffer & { display_price?: string; display_currency?: string }) | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [passengers, setPassengers] = useState<PassengerDetails[]>([]);

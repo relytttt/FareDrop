@@ -1,15 +1,15 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import FlightCard from '@/components/FlightCard';
 import FlightSearch from '@/components/FlightSearch';
 import { DuffelOffer } from '@/types';
 import { ArrowUpDown, Filter } from 'lucide-react';
 
-export default function FlightsPage() {
+function FlightsContent() {
   const searchParams = useSearchParams();
-  const [offers, setOffers] = useState<DuffelOffer[]>([]);
+  const [offers, setOffers] = useState<(DuffelOffer & { display_price?: string; display_currency?: string })[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'price' | 'duration' | 'departure'>('price');
@@ -149,5 +149,20 @@ export default function FlightsPage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function FlightsPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+          <p className="mt-4 text-gray-600">Loading...</p>
+        </div>
+      </div>
+    }>
+      <FlightsContent />
+    </Suspense>
   );
 }
