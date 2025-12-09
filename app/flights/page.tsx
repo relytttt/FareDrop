@@ -59,9 +59,11 @@ function FlightsContent() {
       case 'price':
         return parseFloat(a.display_price || a.total_amount) - parseFloat(b.display_price || b.total_amount);
       case 'duration':
-        return a.slices[0].duration.localeCompare(b.slices[0].duration);
+        return (a.slices?.[0]?.duration || '').localeCompare(b.slices?.[0]?.duration || '');
       case 'departure':
-        return new Date(a.slices[0].departure_time).getTime() - new Date(b.slices[0].departure_time).getTime();
+        const dateA = a.slices?.[0]?.departure_time ? new Date(a.slices[0].departure_time).getTime() : 0;
+        const dateB = b.slices?.[0]?.departure_time ? new Date(b.slices[0].departure_time).getTime() : 0;
+        return dateA - dateB;
       default:
         return 0;
     }
