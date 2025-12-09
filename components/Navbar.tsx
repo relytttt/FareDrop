@@ -24,6 +24,9 @@ export default function Navbar() {
             <Link href="/" className="text-gray-700 hover:text-primary-600 font-medium transition-colors">
               Home
             </Link>
+            <Link href="/search" className="text-gray-700 hover:text-primary-600 font-medium transition-colors">
+              Search Flights
+            </Link>
             <Link href="/deals" className="text-gray-700 hover:text-primary-600 font-medium transition-colors">
               All Deals
             </Link>
@@ -67,6 +70,13 @@ export default function Navbar() {
                 onClick={() => setMobileMenuOpen(false)}
               >
                 Home
+              </Link>
+              <Link
+                href="/search"
+                className="text-gray-700 hover:text-primary-600 font-medium transition-colors"
+                onClick={() => setMobileMenuOpen(false)}
+              >
+                Search Flights
               </Link>
               <Link
                 href="/deals"

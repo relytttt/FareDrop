@@ -113,3 +113,100 @@ export const DEPARTURE_CITIES = [
 
 export type Region = (typeof REGIONS)[number];
 export type DepartureCity = (typeof DEPARTURE_CITIES)[number];
+
+// Duffel API Types
+export interface DuffelOffer {
+  id: string;
+  total_amount: string;
+  total_currency: string;
+  base_amount?: string;
+  tax_amount?: string;
+  owner: {
+    name: string;
+    logo_symbol_url?: string;
+  };
+  slices: DuffelSlice[];
+  passengers: DuffelPassenger[];
+  available_services?: any[];
+  created_at: string;
+  expires_at: string;
+}
+
+export interface DuffelSlice {
+  id: string;
+  origin: {
+    iata_code: string;
+    city_name?: string;
+    name?: string;
+  };
+  destination: {
+    iata_code: string;
+    city_name?: string;
+    name?: string;
+  };
+  departure_time: string;
+  arrival_time: string;
+  duration: string;
+  segments: DuffelSegment[];
+}
+
+export interface DuffelSegment {
+  id: string;
+  origin: {
+    iata_code: string;
+    name?: string;
+  };
+  destination: {
+    iata_code: string;
+    name?: string;
+  };
+  departing_at: string;
+  arriving_at: string;
+  duration: string;
+  operating_carrier: {
+    name: string;
+    iata_code: string;
+    logo_symbol_url?: string;
+  };
+  marketing_carrier: {
+    name: string;
+    iata_code: string;
+  };
+  aircraft?: {
+    name?: string;
+  };
+}
+
+export interface DuffelPassenger {
+  id?: string;
+  type: 'adult' | 'child' | 'infant_without_seat';
+  given_name?: string;
+  family_name?: string;
+  born_on?: string;
+  gender?: 'm' | 'f';
+  email?: string;
+  phone_number?: string;
+}
+
+export interface DuffelOrder {
+  id: string;
+  booking_reference: string;
+  total_amount: string;
+  total_currency: string;
+  created_at: string;
+  passengers: DuffelPassenger[];
+  slices: DuffelSlice[];
+}
+
+export interface FlightSearchFormData {
+  origin: string;
+  destination: string;
+  departureDate: Date | null;
+  returnDate: Date | null;
+  passengers: {
+    adults: number;
+    children: number;
+    infants: number;
+  };
+  cabinClass: 'economy' | 'premium_economy' | 'business' | 'first';
+}

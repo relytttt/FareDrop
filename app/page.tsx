@@ -8,6 +8,7 @@ import EmailCapture from '@/components/EmailCapture';
 import AlertModal from '@/components/AlertModal';
 import FeaturedDeals from '@/components/FeaturedDeals';
 import TripUpsells from '@/components/TripUpsells';
+import FlightSearch from '@/components/FlightSearch';
 import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
 import Link from 'next/link';
 
@@ -97,10 +98,10 @@ export default function Home() {
 
   return (
     <div>
-      {/* Hero Section */}
+      {/* Hero Section with Flight Search */}
       <section className="bg-gradient-to-br from-primary-50 via-white to-accent-50 py-20">
         <div className="container mx-auto px-4">
-          <div className="text-center max-w-4xl mx-auto">
+          <div className="text-center max-w-4xl mx-auto mb-8">
             <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mb-6">
               Find Your Next Adventure at{' '}
               <span className="bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent">
@@ -108,22 +109,28 @@ export default function Home() {
               </span>
             </h1>
             <p className="text-xl text-gray-600 mb-8">
-              We search thousands of flights daily to bring you the best deals. Save up to 90% on your next trip!
+              Search and book flights directly, or browse our curated deals. Save up to 90% on your next trip!
             </p>
-            <div className="flex flex-wrap justify-center gap-4 mb-8">
-              <button
-                onClick={() => setShowAlertModal(true)}
-                className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-4 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                🔔 Get Deal Alerts
-              </button>
-              <Link
-                href="/deals"
-                className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold border-2 border-primary-500 hover:bg-primary-50 transition-all duration-200 shadow-lg hover:shadow-xl"
-              >
-                Browse All Deals
-              </Link>
-            </div>
+          </div>
+
+          {/* Flight Search Form */}
+          <div className="max-w-6xl mx-auto mb-8">
+            <FlightSearch />
+          </div>
+
+          <div className="flex flex-wrap justify-center gap-4 mb-8">
+            <button
+              onClick={() => setShowAlertModal(true)}
+              className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-4 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              🔔 Get Deal Alerts
+            </button>
+            <Link
+              href="/deals"
+              className="bg-white text-primary-600 px-8 py-4 rounded-lg font-semibold border-2 border-primary-500 hover:bg-primary-50 transition-all duration-200 shadow-lg hover:shadow-xl"
+            >
+              Browse All Deals
+            </Link>
           </div>
 
           {/* Stats */}
@@ -152,10 +159,10 @@ export default function Home() {
         <div className="container mx-auto px-4">
           <div className="text-center mb-12">
             <h2 className="text-4xl font-bold text-gray-900 mb-4">
-              🔥 Latest Flight Deals
+              🔥 Featured Flight Deals
             </h2>
             <p className="text-lg text-gray-600">
-              Hand-picked deals updated daily
+              Hand-picked deals updated daily - or search above to book any flight
             </p>
           </div>
 
