@@ -10,9 +10,14 @@ interface FlightCardProps {
     display_price?: string;
     display_currency?: string;
   };
+  searchParams?: {
+    adults?: string;
+    children?: string;
+    infants?: string;
+  };
 }
 
-export default function FlightCard({ offer }: FlightCardProps) {
+export default function FlightCard({ offer, searchParams }: FlightCardProps) {
   const formatDuration = (duration: string) => {
     // Duration is in format PT2H30M
     const match = duration.match(/PT(\d+)H(\d+)M/);
@@ -29,6 +34,11 @@ export default function FlightCard({ offer }: FlightCardProps) {
 
   const displayPrice = offer.display_price || offer.total_amount;
   const currency = offer.display_currency || offer.total_currency;
+
+  // Build booking URL with passenger counts
+  const bookingUrl = searchParams
+    ? `/book/${offer.id}?adults=${searchParams.adults || 1}&children=${searchParams.children || 0}&infants=${searchParams.infants || 0}`
+    : `/book/${offer.id}`;
 
   return (
     <div className="bg-white rounded-lg shadow-md hover:shadow-xl transition-shadow duration-200 p-6 border border-gray-200">
@@ -103,7 +113,7 @@ export default function FlightCard({ offer }: FlightCardProps) {
           <div className="text-xs text-gray-500">includes all fees</div>
         </div>
         <Link
-          href={`/book/${offer.id}`}
+          href={bookingUrl}
           className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
         >
           Select Flight

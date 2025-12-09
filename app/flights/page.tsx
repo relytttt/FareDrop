@@ -42,6 +42,8 @@ export default function FlightsPage() {
 
       if (data.success) {
         setOffers(data.offers);
+        // Cache offers in localStorage for booking page
+        localStorage.setItem('flightOffers', JSON.stringify(data.offers));
       } else {
         setError(data.error || 'Failed to search flights');
       }
@@ -126,7 +128,15 @@ export default function FlightsPage() {
             {sortedOffers.length > 0 ? (
               <div className="space-y-4">
                 {sortedOffers.map((offer) => (
-                  <FlightCard key={offer.id} offer={offer} />
+                  <FlightCard
+                    key={offer.id}
+                    offer={offer}
+                    searchParams={{
+                      adults: searchParams.get('adults') || '1',
+                      children: searchParams.get('children') || '0',
+                      infants: searchParams.get('infants') || '0',
+                    }}
+                  />
                 ))}
               </div>
             ) : (
