@@ -1,6 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { duffel, calculateTotalPrice } from '@/lib/duffel';
 
+// Mark route as dynamic
+export const dynamic = 'force-dynamic';
+
 const POPULAR_ROUTES = [
   { origin: 'SYD', destination: 'DPS', originCity: 'Sydney', destinationCity: 'Bali' },
   { origin: 'SYD', destination: 'BKK', originCity: 'Sydney', destinationCity: 'Bangkok' },
