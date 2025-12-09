@@ -18,7 +18,7 @@ export default function Home() {
   const [loading, setLoading] = useState(true);
   const [showAlertModal, setShowAlertModal] = useState(false);
   const [filters, setFilters] = useState<SearchFiltersType>({});
-  const [viewMode, setViewMode] = useState<ViewMode>('tile');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   useEffect(() => {
     fetchDeals();
