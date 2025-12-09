@@ -17,13 +17,13 @@ export default function TripUpsells({
 }: TripUpsellsProps) {
   const destinationName = destinationCity || destination || 'your destination';
   
-  // Build affiliate URLs
+  // Build affiliate URLs with proper encoding
   const hotelsUrl = destination
-    ? `https://search.hotellook.com/?marker=689762&destination=${destination}${departureDate ? `&checkIn=${departureDate}` : ''}${returnDate ? `&checkOut=${returnDate}` : ''}`
+    ? `https://search.hotellook.com/?marker=689762&destination=${encodeURIComponent(destination)}${departureDate ? `&checkIn=${encodeURIComponent(departureDate)}` : ''}${returnDate ? `&checkOut=${encodeURIComponent(returnDate)}` : ''}`
     : 'https://search.hotellook.com/?marker=689762';
     
   const carsUrl = destination
-    ? `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${destination}`
+    ? `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${encodeURIComponent(destination)}`
     : 'https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2F';
     
   const insuranceUrl = 'https://safetywing.com/nomad-insurance?referenceID=faredrop';

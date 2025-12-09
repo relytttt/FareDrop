@@ -26,9 +26,9 @@ export async function sendDealAlert({ subscriber, deal }: SendDealAlertParams) {
     ? Math.round(((deal.original_price - deal.price) / deal.original_price) * 100)
     : 0;
 
-  // Build upsell URLs
-  const hotelsUrl = `https://search.hotellook.com/?marker=689762&destination=${deal.destination}${deal.departure_date ? `&checkIn=${deal.departure_date}` : ''}${deal.return_date ? `&checkOut=${deal.return_date}` : ''}`;
-  const carsUrl = `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${deal.destination}`;
+  // Build upsell URLs with proper encoding
+  const hotelsUrl = `https://search.hotellook.com/?marker=689762&destination=${encodeURIComponent(deal.destination)}${deal.departure_date ? `&checkIn=${encodeURIComponent(deal.departure_date)}` : ''}${deal.return_date ? `&checkOut=${encodeURIComponent(deal.return_date)}` : ''}`;
+  const carsUrl = `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${encodeURIComponent(deal.destination)}`;
   const insuranceUrl = 'https://safetywing.com/nomad-insurance?referenceID=faredrop';
 
   try {

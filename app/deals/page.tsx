@@ -141,7 +141,7 @@ export default function DealsPage() {
             {/* Trip Upsells Section */}
             <div className="mt-12">
               <TripUpsells 
-                destination={filters.destinationCity ? filteredDeals[0]?.destination : undefined}
+                destination={filters.destinationCity && filteredDeals.length > 0 ? filteredDeals[0]?.destination : undefined}
                 destinationCity={filters.destinationCity || (filteredDeals.length > 0 ? filteredDeals[0]?.destination_city : undefined)}
               />
             </div>

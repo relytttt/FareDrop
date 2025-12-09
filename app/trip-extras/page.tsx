@@ -10,14 +10,14 @@ export default function TripExtrasPage() {
 
   const handleHotelSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    const url = `https://search.hotellook.com/?marker=689762${destination ? `&destination=${destination}` : ''}${checkIn ? `&checkIn=${checkIn}` : ''}${checkOut ? `&checkOut=${checkOut}` : ''}`;
+    const url = `https://search.hotellook.com/?marker=689762${destination ? `&destination=${encodeURIComponent(destination)}` : ''}${checkIn ? `&checkIn=${encodeURIComponent(checkIn)}` : ''}${checkOut ? `&checkOut=${encodeURIComponent(checkOut)}` : ''}`;
     window.open(url, '_blank');
   };
 
   const handleCarSearch = (e: React.FormEvent) => {
     e.preventDefault();
     const url = destination
-      ? `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${destination}`
+      ? `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${encodeURIComponent(destination)}`
       : 'https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2F';
     window.open(url, '_blank');
   };
