@@ -6,6 +6,7 @@ import FlightCard from '@/components/FlightCard';
 import FlightSearch from '@/components/FlightSearch';
 import { DuffelOffer } from '@/types';
 import { ArrowUpDown, Filter } from 'lucide-react';
+import { parseISO, isValid } from 'date-fns';
 
 function FlightsContent() {
   const searchParams = useSearchParams();
@@ -61,8 +62,22 @@ function FlightsContent() {
       case 'duration':
         return (a.slices?.[0]?.duration || '').localeCompare(b.slices?.[0]?.duration || '');
       case 'departure':
-        const dateA = a.slices?.[0]?.departure_time ? new Date(a.slices[0].departure_time).getTime() : 0;
-        const dateB = b.slices?.[0]?.departure_time ? new Date(b.slices[0].departure_time).getTime() : 0;
+        const dateA = a.slices?.[0]?.departure_time ? (() => {
+          try {
+            const date = parseISO(a.slices[0].departure_time);
+            return isValid(date) ? date.getTime() : 0;
+          } catch {
+            return 0;
+          }
+        })() : 0;
+        const dateB = b.slices?.[0]?.departure_time ? (() => {
+          try {
+            const date = parseISO(b.slices[0].departure_time);
+            return isValid(date) ? date.getTime() : 0;
+          } catch {
+            return 0;
+          }
+        })() : 0;
         return dateA - dateB;
       default:
         return 0;
