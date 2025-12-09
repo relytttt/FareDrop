@@ -7,6 +7,7 @@ import SearchFilters from '@/components/SearchFilters';
 import FeaturedDeals from '@/components/FeaturedDeals';
 import TripUpsells from '@/components/TripUpsells';
 import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
+import { isDateInRange } from '@/lib/utils/dateUtils';
 
 export default function DealsPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
@@ -14,6 +15,12 @@ export default function DealsPage() {
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SearchFiltersType>({});
   const [viewMode, setViewMode] = useState<ViewMode>('list');
+  
+  // Date filter state
+  const [departureDate, setDepartureDate] = useState<string>('any');
+  const [returnDate, setReturnDate] = useState<string>('any');
+  const [customDepartureDate, setCustomDepartureDate] = useState<string>('');
+  const [customReturnDate, setCustomReturnDate] = useState<string>('');
 
   useEffect(() => {
     fetchDeals();
@@ -21,7 +28,7 @@ export default function DealsPage() {
 
   useEffect(() => {
     applyFilters();
-  }, [deals, filters]);
+  }, [deals, filters, departureDate, returnDate, customDepartureDate, customReturnDate]);
 
   const fetchDeals = async () => {
     try {
@@ -66,6 +73,64 @@ export default function DealsPage() {
       });
     }
 
+    // Date filter for departure
+    if (departureDate !== 'any' && departureDate !== 'flexible') {
+      const now = new Date();
+      now.setHours(0, 0, 0, 0);
+      
+      if (departureDate === 'this-month') {
+        const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        filtered = filtered.filter(deal => 
+          isDateInRange(deal.departure_date, now, endOfMonth)
+        );
+      } else if (departureDate === 'next-month') {
+        const startOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+        const endOfNextMonth = new Date(now.getFullYear(), now.getMonth() + 2, 0);
+        filtered = filtered.filter(deal => 
+          isDateInRange(deal.departure_date, startOfNextMonth, endOfNextMonth)
+        );
+      } else if (departureDate === 'custom' && customDepartureDate) {
+        const customDate = new Date(customDepartureDate);
+        const flexibleStart = new Date(customDate);
+        flexibleStart.setDate(customDate.getDate() - 3);
+        const flexibleEnd = new Date(customDate);
+        flexibleEnd.setDate(customDate.getDate() + 3);
+        filtered = filtered.filter(deal => 
+          isDateInRange(deal.departure_date, flexibleStart, flexibleEnd)
+        );
+      }
+    }
+
+    // Date filter for return (based on trip duration)
+    if (returnDate !== 'any') {
+      if (returnDate === '1-week') {
+        filtered = filtered.filter(deal => {
+          if (!deal.return_date || !deal.departure_date) return false;
+          const departure = new Date(deal.departure_date);
+          const returnD = new Date(deal.return_date);
+          const duration = Math.ceil((returnD.getTime() - departure.getTime()) / (1000 * 60 * 60 * 24));
+          return duration >= 5 && duration <= 9; // ~1 week (5-9 days)
+        });
+      } else if (returnDate === '2-weeks') {
+        filtered = filtered.filter(deal => {
+          if (!deal.return_date || !deal.departure_date) return false;
+          const departure = new Date(deal.departure_date);
+          const returnD = new Date(deal.return_date);
+          const duration = Math.ceil((returnD.getTime() - departure.getTime()) / (1000 * 60 * 60 * 24));
+          return duration >= 12 && duration <= 16; // ~2 weeks (12-16 days)
+        });
+      } else if (returnDate === 'custom' && customReturnDate) {
+        const customReturn = new Date(customReturnDate);
+        const flexibleStart = new Date(customReturn);
+        flexibleStart.setDate(customReturn.getDate() - 2);
+        const flexibleEnd = new Date(customReturn);
+        flexibleEnd.setDate(customReturn.getDate() + 2);
+        filtered = filtered.filter(deal => 
+          isDateInRange(deal.return_date, flexibleStart, flexibleEnd)
+        );
+      }
+    }
+
     switch (filters.sortBy) {
       case 'price':
         filtered.sort((a, b) => a.price - b.price);
@@ -98,6 +163,89 @@ export default function DealsPage() {
         </div>
 
         <SearchFilters onFilterChange={setFilters} initialFilters={filters} deals={deals} />
+
+        {/* Date Filter Controls */}
+        <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Filter by Travel Dates</h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Departure Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Departure</label>
+              <select 
+                value={departureDate}
+                onChange={(e) => {
+                  setDepartureDate(e.target.value);
+                  if (e.target.value !== 'custom') {
+                    setCustomDepartureDate('');
+                  }
+                }}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="any">Any Date</option>
+                <option value="flexible">Flexible (+/- 3 days)</option>
+                <option value="this-month">This Month</option>
+                <option value="next-month">Next Month</option>
+                <option value="custom">Choose Date...</option>
+              </select>
+              {departureDate === 'custom' && (
+                <input 
+                  type="date" 
+                  value={customDepartureDate}
+                  onChange={(e) => setCustomDepartureDate(e.target.value)}
+                  className="w-full mt-3 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  min={new Date().toISOString().split('T')[0]}
+                />
+              )}
+            </div>
+
+            {/* Return Date Filter */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Return</label>
+              <select 
+                value={returnDate}
+                onChange={(e) => {
+                  setReturnDate(e.target.value);
+                  if (e.target.value !== 'custom') {
+                    setCustomReturnDate('');
+                  }
+                }}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+              >
+                <option value="any">Any Date</option>
+                <option value="1-week">~1 Week Trip</option>
+                <option value="2-weeks">~2 Weeks Trip</option>
+                <option value="custom">Choose Date...</option>
+              </select>
+              {returnDate === 'custom' && (
+                <input 
+                  type="date" 
+                  value={customReturnDate}
+                  onChange={(e) => setCustomReturnDate(e.target.value)}
+                  className="w-full mt-3 border border-gray-300 rounded-lg px-4 py-2 focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                  min={customDepartureDate || new Date().toISOString().split('T')[0]}
+                />
+              )}
+            </div>
+          </div>
+          {(departureDate !== 'any' || returnDate !== 'any') && (
+            <div className="mt-4 flex items-center justify-between">
+              <p className="text-sm text-gray-600">
+                Active date filters: {filteredDeals.length} of {deals.length} deals
+              </p>
+              <button 
+                onClick={() => {
+                  setDepartureDate('any');
+                  setReturnDate('any');
+                  setCustomDepartureDate('');
+                  setCustomReturnDate('');
+                }}
+                className="text-sm text-primary-600 hover:text-primary-700 font-medium"
+              >
+                Clear Date Filters
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* View Toggle Buttons */}
         <div className="flex gap-2 mb-6">
