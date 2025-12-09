@@ -21,7 +21,7 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   const daysUntilExpiry = Math.ceil((expiresDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
   // Build flights page URL with search params
-  const flightsUrl = `/flights?origin=${deal.origin}&destination=${deal.destination}&departureDate=${deal.departure_date}&returnDate=${deal.return_date || ''}&adults=1&children=0&infants=0&cabinClass=economy`;
+  const flightsUrl = `/flights?origin=${encodeURIComponent(deal.origin)}&destination=${encodeURIComponent(deal.destination)}&departureDate=${encodeURIComponent(deal.departure_date)}&returnDate=${encodeURIComponent(deal.return_date || '')}&adults=1&children=0&infants=0&cabinClass=economy`;
 
   // Compact list view variant
   if (variant === 'compact') {

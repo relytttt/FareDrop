@@ -44,6 +44,8 @@ export async function GET(request: NextRequest) {
     // Fetch cheapest price for each route (in parallel)
     const routePromises = POPULAR_ROUTES.map(async (route) => {
       try {
+        // Create offer request with Duffel API
+        // Note: Using 'as any' due to complex Duffel SDK type requirements
         const offerRequest = await duffel.offerRequests.create({
           slices: [
             { origin: route.origin, destination: route.destination, departure_date: departureDate },
@@ -105,14 +107,18 @@ export async function GET(request: NextRequest) {
     });
 
     const results = await Promise.all(routePromises);
-    const validDeals = results.filter(Boolean);
+    const validDeals = results.filter((deal): deal is NonNullable<typeof deal> => deal !== null);
 
     // Sort by price
-    validDeals.sort((a, b) => a!.price - b!.price);
+    validDeals.sort((a, b) => a.price - b.price);
 
     return NextResponse.json({ 
       deals: validDeals,
       fetched_at: new Date().toISOString(),
+    }, {
+      headers: {
+        'Cache-Control': 'public, s-maxage=600, stale-while-revalidate=300', // Cache for 10 minutes
+      },
     });
   } catch (error) {
     console.error('Error fetching live deals:', error);
