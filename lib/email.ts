@@ -26,6 +26,11 @@ export async function sendDealAlert({ subscriber, deal }: SendDealAlertParams) {
     ? Math.round(((deal.original_price - deal.price) / deal.original_price) * 100)
     : 0;
 
+  // Build upsell URLs with proper encoding
+  const hotelsUrl = `https://search.hotellook.com/?marker=689762&destination=${encodeURIComponent(deal.destination)}${deal.departure_date ? `&checkIn=${encodeURIComponent(deal.departure_date)}` : ''}${deal.return_date ? `&checkOut=${encodeURIComponent(deal.return_date)}` : ''}`;
+  const carsUrl = `https://tp.media/r?marker=689762&trs=267029&p=7658&u=https%3A%2F%2Fwww.rentalcars.com%2FSearchResults.do%3FpickupLocation%3D${encodeURIComponent(deal.destination)}`;
+  const insuranceUrl = 'https://safetywing.com/nomad-insurance?referenceID=faredrop';
+
   try {
     const data = await resend.emails.send({
       from: 'FareDrop <alerts@faredrop.com>',
@@ -64,6 +69,30 @@ export async function sendDealAlert({ subscriber, deal }: SendDealAlertParams) {
                 <a href="${deal.affiliate_link}" style="display: inline-block; background: linear-gradient(135deg, #00a0a0 0%, #0077e6 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px;">Book This Deal</a>
                 
                 <p style="margin-top: 30px; font-size: 12px; color: #999;">This deal expires on ${new Date(deal.expires_at).toLocaleDateString()}. Book soon!</p>
+              </div>
+              
+              <!-- Complete Your Trip Upsells -->
+              <div style="margin-top: 20px; padding: 20px; background: white; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="color: #00a0a0; margin-top: 0; margin-bottom: 15px;">✈️ Complete Your Trip to ${deal.destination_city}</h3>
+                <p style="margin-bottom: 15px; color: #666;">Make the most of your journey with these travel essentials:</p>
+                
+                <div style="margin: 12px 0;">
+                  <a href="${hotelsUrl}" style="display: block; color: #0077e6; text-decoration: none; padding: 10px; background: #f0f8ff; border-radius: 6px; margin-bottom: 10px;">
+                    🏨 <strong>Find hotels from $45/night</strong> - Search now →
+                  </a>
+                </div>
+                
+                <div style="margin: 12px 0;">
+                  <a href="${carsUrl}" style="display: block; color: #0077e6; text-decoration: none; padding: 10px; background: #f0f8ff; border-radius: 6px; margin-bottom: 10px;">
+                    🚗 <strong>Rent a car from $25/day</strong> - Search now →
+                  </a>
+                </div>
+                
+                <div style="margin: 12px 0;">
+                  <a href="${insuranceUrl}" style="display: block; color: #0077e6; text-decoration: none; padding: 10px; background: #f0f8ff; border-radius: 6px;">
+                    🛡️ <strong>Protect your trip from $42/month</strong> - Get covered →
+                  </a>
+                </div>
               </div>
               
               <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">

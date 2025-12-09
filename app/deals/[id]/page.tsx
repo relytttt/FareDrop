@@ -1,6 +1,7 @@
 import { notFound } from 'next/navigation';
 import { Plane, Calendar, MapPin, TrendingDown, ExternalLink } from 'lucide-react';
 import PriceDisplay from '@/components/PriceDisplay';
+import TripUpsells from '@/components/TripUpsells';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 
@@ -186,6 +187,16 @@ export default async function DealDetailsPage({ params }: { params: { id: string
             <li>• Arrive at the airport 2-3 hours before international flights</li>
             <li>• Sign up for deal alerts to never miss savings like these</li>
           </ul>
+        </div>
+
+        {/* Trip Upsells Section */}
+        <div className="mt-8">
+          <TripUpsells 
+            destination={deal.destination}
+            destinationCity={deal.destination_city}
+            departureDate={deal.departure_date}
+            returnDate={deal.return_date || undefined}
+          />
         </div>
       </div>
     </div>

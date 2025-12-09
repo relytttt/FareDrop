@@ -5,6 +5,7 @@ import { LayoutGrid, List } from 'lucide-react';
 import DealGrid from '@/components/DealGrid';
 import SearchFilters from '@/components/SearchFilters';
 import FeaturedDeals from '@/components/FeaturedDeals';
+import TripUpsells from '@/components/TripUpsells';
 import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
 
 export default function DealsPage() {
@@ -136,6 +137,14 @@ export default function DealsPage() {
             
             {/* All Deals with selected view mode */}
             <DealGrid deals={filteredDeals} emptyMessage="No deals match your filters" viewMode={viewMode} />
+            
+            {/* Trip Upsells Section */}
+            <div className="mt-12">
+              <TripUpsells 
+                destination={filters.destinationCity && filteredDeals.length > 0 ? filteredDeals[0]?.destination : undefined}
+                destinationCity={filters.destinationCity || (filteredDeals.length > 0 ? filteredDeals[0]?.destination_city : undefined)}
+              />
+            </div>
           </>
         )}
       </div>
