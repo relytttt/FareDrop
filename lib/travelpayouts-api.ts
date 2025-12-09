@@ -3,6 +3,11 @@ import { Deal, TravelpayoutsApiResponse } from '@/types';
 const TRAVELPAYOUTS_API_KEY = process.env.TRAVELPAYOUTS_API_KEY;
 const TRAVELPAYOUTS_API_BASE_URL = 'https://api.travelpayouts.com/v2';
 
+// Affiliate link configuration
+const AVIASALES_AFFILIATE_MARKER = '689762';
+const DEFAULT_PASSENGERS = 1;
+const DEFAULT_RETURN_DAYS = 7; // Default days for round trip return
+
 const AIRPORT_TO_CITY: Record<string, string> = {
   // Australian Origins
   'SYD': 'Sydney',
@@ -187,7 +192,7 @@ export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
   
   // Calculate return date (default 7 days later for round trip)
   const returnDate = new Date(departureDate);
-  returnDate.setDate(returnDate.getDate() + 7);
+  returnDate.setDate(returnDate.getDate() + DEFAULT_RETURN_DAYS);
   
   // Format dates as DDMM for Aviasales
   const formatDate = (date: Date) => {
@@ -201,7 +206,7 @@ export function convertTravelpayoutsToDeal(data: any): Partial<Deal> {
   
   // Generate proper Aviasales affiliate link
   // Format: /search/{origin}{departDate}{destination}{returnDate}{passengers}
-  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${departCode}${data.destination}${returnCode}1?marker=689762`;
+  const affiliateLink = `https://www.aviasales.com/search/${data.origin}${departCode}${data.destination}${returnCode}${DEFAULT_PASSENGERS}?marker=${AVIASALES_AFFILIATE_MARKER}`;
   
   // Look up city names and region
   const originCity = AIRPORT_TO_CITY[data.origin] || data.origin;
