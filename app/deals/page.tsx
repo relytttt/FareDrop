@@ -13,7 +13,7 @@ export default function DealsPage() {
   const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<SearchFiltersType>({});
-  const [viewMode, setViewMode] = useState<ViewMode>('tile');
+  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   useEffect(() => {
     fetchDeals();

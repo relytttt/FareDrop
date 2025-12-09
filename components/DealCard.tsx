@@ -1,6 +1,7 @@
 import { Deal } from '@/types';
-import { Plane, Calendar, TrendingDown } from 'lucide-react';
+import { Plane, Calendar, TrendingDown, Moon } from 'lucide-react';
 import Link from 'next/link';
+import { formatDate, formatShortDate, calculateTripDuration } from '@/lib/utils/dateUtils';
 
 interface DealCardProps {
   deal: Deal;
@@ -12,7 +13,10 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
     ? Math.round(((deal.original_price - deal.price) / deal.original_price) * 100)
     : 0;
 
-  const departureDate = new Date(deal.departure_date);
+  const formattedDepartureDate = formatShortDate(deal.departure_date);
+  const formattedReturnDate = formatShortDate(deal.return_date);
+  const tripDuration = calculateTripDuration(deal.departure_date, deal.return_date);
+  
   const expiresDate = new Date(deal.expires_at);
   const daysUntilExpiry = Math.ceil((expiresDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
@@ -38,15 +42,22 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
                 </div>
               </div>
 
-              {/* Details */}
-              <div className="flex items-center gap-3 text-xs text-gray-600 flex-shrink-0">
+              {/* Details with dates and trip info */}
+              <div className="flex items-center gap-3 text-sm text-gray-600 flex-shrink-0">
                 <span className="font-medium">{deal.airline}</span>
-                <span>
-                  {departureDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                <span className="flex items-center gap-1">
+                  <Calendar size={14} className="text-primary-500" />
+                  {formattedDepartureDate} - {formattedReturnDate}
                 </span>
-                {deal.destination_region && (
-                  <span className="bg-primary-50 text-primary-700 px-2 py-1 rounded font-medium">
-                    {deal.destination_region}
+                {tripDuration && (
+                  <span className="flex items-center gap-1 bg-blue-50 text-blue-700 px-2 py-1 rounded font-medium">
+                    <Moon size={14} />
+                    {tripDuration} night{tripDuration !== 1 ? 's' : ''}
+                  </span>
+                )}
+                {deal.trip_type && (
+                  <span className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded">
+                    {deal.trip_type === 'round-trip' ? 'Round-trip' : 'One-way'}
                   </span>
                 )}
               </div>
@@ -75,7 +86,7 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
                   rel="noopener noreferrer"
                   className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 text-sm"
                 >
-                  Book
+                  View Deal →
                 </a>
                 <Link
                   href={`/deals/${deal.id}`}
@@ -151,9 +162,14 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
           <div className="flex items-center gap-2">
             <Calendar size={16} className="text-primary-500" />
             <span>
-              {departureDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+              {formattedDepartureDate}
               {deal.return_date && (
-                <> - {new Date(deal.return_date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</>
+                <> - {formattedReturnDate}</>
+              )}
+              {tripDuration && (
+                <span className="ml-2 text-blue-700 font-medium">
+                  ({tripDuration} night{tripDuration !== 1 ? 's' : ''})
+                </span>
               )}
             </span>
           </div>
