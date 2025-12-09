@@ -15,6 +15,17 @@ function FlightsContent() {
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'price' | 'duration' | 'departure'>('price');
 
+  // Helper to safely parse date strings and return timestamp
+  const getSafeTimestamp = (dateString: string | null | undefined): number => {
+    if (!dateString) return 0;
+    try {
+      const date = parseISO(dateString);
+      return isValid(date) ? date.getTime() : 0;
+    } catch {
+      return 0;
+    }
+  };
+
   useEffect(() => {
     searchFlights();
   }, [searchParams]);
@@ -62,22 +73,8 @@ function FlightsContent() {
       case 'duration':
         return (a.slices?.[0]?.duration || '').localeCompare(b.slices?.[0]?.duration || '');
       case 'departure':
-        const dateA = a.slices?.[0]?.departure_time ? (() => {
-          try {
-            const date = parseISO(a.slices[0].departure_time);
-            return isValid(date) ? date.getTime() : 0;
-          } catch {
-            return 0;
-          }
-        })() : 0;
-        const dateB = b.slices?.[0]?.departure_time ? (() => {
-          try {
-            const date = parseISO(b.slices[0].departure_time);
-            return isValid(date) ? date.getTime() : 0;
-          } catch {
-            return 0;
-          }
-        })() : 0;
+        const dateA = getSafeTimestamp(a.slices?.[0]?.departure_time);
+        const dateB = getSafeTimestamp(b.slices?.[0]?.departure_time);
         return dateA - dateB;
       default:
         return 0;
