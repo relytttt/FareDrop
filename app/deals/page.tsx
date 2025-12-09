@@ -13,6 +13,7 @@ export default function DealsPage() {
   const [deals, setDeals] = useState<Deal[]>([]);
   const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<SearchFiltersType>({});
   const [viewMode, setViewMode] = useState<ViewMode>('list');
   
@@ -31,14 +32,20 @@ export default function DealsPage() {
   }, [deals, filters, departureDate, returnDate, customDepartureDate, customReturnDate]);
 
   const fetchDeals = async () => {
+    setLoading(true);
+    setError(null);
     try {
-      const response = await fetch('/api/deals');
+      // Fetch live deals from Duffel API
+      const response = await fetch('/api/flights/deals');
       if (response.ok) {
         const data = await response.json();
         setDeals(data.deals || []);
+      } else {
+        setError('Failed to fetch deals');
       }
     } catch (error) {
       console.error('Error fetching deals:', error);
+      setError('Error loading deals. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -63,14 +70,6 @@ export default function DealsPage() {
 
     if (filters.maxPrice) {
       filtered = filtered.filter((deal) => deal.price <= filters.maxPrice!);
-    }
-
-    if (filters.minDiscount && filters.minDiscount > 0) {
-      filtered = filtered.filter((deal) => {
-        if (!deal.original_price) return false;
-        const discount = ((deal.original_price - deal.price) / deal.original_price) * 100;
-        return discount >= filters.minDiscount!;
-      });
     }
 
     // Date filter for departure
@@ -138,13 +137,9 @@ export default function DealsPage() {
       case 'date':
         filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
         break;
-      case 'discount':
       default:
-        filtered.sort((a, b) => {
-          const discountA = a.original_price ? ((a.original_price - a.price) / a.original_price) * 100 : 0;
-          const discountB = b.original_price ? ((b.original_price - b.price) / b.original_price) * 100 : 0;
-          return discountB - discountA;
-        });
+        // Default sort by price (cheapest first)
+        filtered.sort((a, b) => a.price - b.price);
     }
 
     setFilteredDeals(filtered);
@@ -274,9 +269,37 @@ export default function DealsPage() {
         </div>
 
         {loading ? (
-          <div className="text-center py-16">
-            <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
-            <p className="mt-4 text-gray-600">Loading deals...</p>
+          <div>
+            <div className="text-center py-8 mb-8">
+              <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
+              <p className="mt-4 text-gray-600">Finding the best flight deals for you...</p>
+              <p className="text-sm text-gray-500 mt-2">This may take up to 30 seconds</p>
+            </div>
+            {/* Skeleton loaders */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-md overflow-hidden">
+                  <div className="p-6 space-y-4">
+                    <div className="bg-gray-200 animate-pulse h-6 rounded w-3/4"></div>
+                    <div className="bg-gray-200 animate-pulse h-10 rounded w-1/2"></div>
+                    <div className="bg-gray-200 animate-pulse h-4 rounded w-full"></div>
+                    <div className="bg-gray-200 animate-pulse h-4 rounded w-2/3"></div>
+                    <div className="bg-gray-200 animate-pulse h-12 rounded w-full mt-4"></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
+            <p className="text-red-800 font-semibold mb-2">Error Loading Deals</p>
+            <p className="text-red-600 mb-4">{error}</p>
+            <button
+              onClick={fetchDeals}
+              className="bg-red-500 text-white px-6 py-2 rounded-lg hover:bg-red-600 transition-colors"
+            >
+              Try Again
+            </button>
           </div>
         ) : (
           <>

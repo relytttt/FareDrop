@@ -20,6 +20,9 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   const expiresDate = new Date(deal.expires_at);
   const daysUntilExpiry = Math.ceil((expiresDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
 
+  // Build flights page URL with search params
+  const flightsUrl = `/flights?origin=${deal.origin}&destination=${deal.destination}&departureDate=${deal.departure_date}&returnDate=${deal.return_date || ''}&adults=1&children=0&infants=0&cabinClass=economy`;
+
   // Compact list view variant
   if (variant === 'compact') {
     return (
@@ -67,27 +70,18 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
             <div className="flex items-center gap-4 flex-shrink-0">
               <div className="text-right">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-2xl font-bold text-accent-600">${deal.price}</span>
-                  {deal.original_price && (
-                    <span className="text-sm text-gray-400 line-through">${deal.original_price}</span>
-                  )}
+                  <span className="text-2xl font-bold text-accent-600">${Math.round(deal.price)}</span>
                 </div>
-                {discountPercent > 0 && (
-                  <span className="inline-block bg-red-100 text-red-700 px-2 py-1 rounded text-xs font-semibold mt-1">
-                    {discountPercent}% OFF
-                  </span>
-                )}
+                <span className="text-sm text-gray-500">per person</span>
               </div>
 
               <div className="flex gap-2">
-                <a
-                  href={deal.affiliate_link}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                <Link
+                  href={flightsUrl}
                   className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-4 py-2 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 text-sm"
                 >
-                  View Deal →
-                </a>
+                  View Flights →
+                </Link>
                 <Link
                   href={`/deals/${deal.id}`}
                   className="px-4 py-2 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-colors duration-200 text-sm"
@@ -141,15 +135,8 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
         {/* Price Section */}
         <div className="mb-4">
           <div className="flex items-baseline gap-3">
-            <span className="text-4xl font-bold text-accent-600">${deal.price}</span>
-            {deal.original_price && (
-              <>
-                <span className="text-xl text-gray-400 line-through">${deal.original_price}</span>
-                <span className="bg-red-100 text-red-700 px-3 py-1 rounded-full text-sm font-semibold">
-                  {discountPercent}% OFF
-                </span>
-              </>
-            )}
+            <span className="text-4xl font-bold text-accent-600">${Math.round(deal.price)}</span>
+            <span className="text-sm text-gray-500">per person</span>
           </div>
         </div>
 
@@ -192,14 +179,12 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
 
         {/* Actions */}
         <div className="flex gap-3">
-          <a
-            href={deal.affiliate_link}
-            target="_blank"
-            rel="noopener noreferrer"
+          <Link
+            href={flightsUrl}
             className="flex-1 bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 text-center"
           >
-            Book Now
-          </a>
+            View Flights →
+          </Link>
           <Link
             href={`/deals/${deal.id}`}
             className="px-6 py-3 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-colors duration-200 text-center"
