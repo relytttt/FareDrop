@@ -66,30 +66,30 @@ ALTER TABLE payments ENABLE ROW LEVEL SECURITY;
 -- RLS policies for users (users can only see their own data)
 CREATE POLICY "Users can view own data"
     ON users FOR SELECT
-    USING (true);
+    USING (auth.uid()::text = id::text);
 
 CREATE POLICY "Users can insert own data"
     ON users FOR INSERT
-    WITH CHECK (true);
+    WITH CHECK (auth.uid()::text = id::text);
 
 CREATE POLICY "Users can update own data"
     ON users FOR UPDATE
-    USING (true);
+    USING (auth.uid()::text = id::text);
 
--- RLS policies for bookings
-CREATE POLICY "Bookings are viewable by everyone"
+-- RLS policies for bookings (users can only see their own bookings)
+CREATE POLICY "Users can view own bookings"
     ON bookings FOR SELECT
-    USING (true);
+    USING (auth.uid()::text = user_id::text);
 
-CREATE POLICY "Bookings can be inserted"
+CREATE POLICY "Service role can insert bookings"
     ON bookings FOR INSERT
     WITH CHECK (true);
 
--- RLS policies for payments
-CREATE POLICY "Payments are viewable by everyone"
+-- RLS policies for payments (users can only see their own payments)
+CREATE POLICY "Users can view own payments"
     ON payments FOR SELECT
-    USING (true);
+    USING (auth.uid()::text = user_id::text);
 
-CREATE POLICY "Payments can be inserted"
+CREATE POLICY "Service role can insert payments"
     ON payments FOR INSERT
     WITH CHECK (true);
