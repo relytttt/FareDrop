@@ -4,9 +4,10 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import FlightCard from '@/components/FlightCard';
 import FlightSearch from '@/components/FlightSearch';
-import { DuffelOffer } from '@/types';
+import { DuffelOffer, DuffelSlice } from '@/types';
 import { ArrowUpDown, Filter } from 'lucide-react';
 import { parseISO, isValid } from 'date-fns';
+import { getDepartureTime } from '@/lib/utils/flightUtils';
 
 function FlightsContent() {
   const searchParams = useSearchParams();
@@ -73,8 +74,8 @@ function FlightsContent() {
       case 'duration':
         return (a.slices?.[0]?.duration || '').localeCompare(b.slices?.[0]?.duration || '');
       case 'departure':
-        const dateA = getSafeTimestamp(a.slices?.[0]?.departure_time);
-        const dateB = getSafeTimestamp(b.slices?.[0]?.departure_time);
+        const dateA = getSafeTimestamp(getDepartureTime(a.slices?.[0]));
+        const dateB = getSafeTimestamp(getDepartureTime(b.slices?.[0]));
         return dateA - dateB;
       default:
         return 0;

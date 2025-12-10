@@ -9,6 +9,7 @@ import PriceBreakdown from '@/components/PriceBreakdown';
 import AddOns from '@/components/AddOns';
 import { format } from 'date-fns';
 import { Plane, Calendar, Clock } from 'lucide-react';
+import { getDepartureTime, getArrivalTime } from '@/lib/utils/flightUtils';
 
 export default function BookingPage() {
   const params = useParams();
@@ -164,7 +165,11 @@ export default function BookingPage() {
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Flight Summary</h2>
               
-              {offer.slices.map((slice, index) => (
+              {offer.slices.map((slice, index) => {
+                const departureTime = getDepartureTime(slice);
+                const arrivalTime = getArrivalTime(slice);
+                
+                return (
                 <div key={slice.id} className={`${index > 0 ? 'mt-4 pt-4 border-t' : ''}`}>
                   <div className="flex items-center gap-4 mb-2">
                     <Plane className="w-5 h-5 text-primary-500" />
@@ -175,15 +180,16 @@ export default function BookingPage() {
                   <div className="ml-9 text-sm text-gray-600 space-y-1">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      {format(new Date(slice.departure_time), 'EEE, dd MMM yyyy')}
+                      {departureTime ? format(new Date(departureTime), 'EEE, dd MMM yyyy') : 'TBD'}
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      {format(new Date(slice.departure_time), 'HH:mm')} - {format(new Date(slice.arrival_time), 'HH:mm')}
+                      {departureTime ? format(new Date(departureTime), 'HH:mm') : '--:--'} - {arrivalTime ? format(new Date(arrivalTime), 'HH:mm') : '--:--'}
                     </div>
                   </div>
                 </div>
-              ))}
+                );
+              })}
 
               <div className="mt-4 pt-4 border-t">
                 <div className="flex items-center gap-3">

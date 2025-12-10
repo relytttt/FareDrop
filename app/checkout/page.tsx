@@ -6,6 +6,7 @@ import PriceBreakdown from '@/components/PriceBreakdown';
 import { SERVICE_FEE, MARKUP_PERCENTAGE, calculateTotalPrice } from '@/lib/duffel';
 import { format } from 'date-fns';
 import { CreditCard, Lock } from 'lucide-react';
+import { getDepartureTime } from '@/lib/utils/flightUtils';
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -118,28 +119,33 @@ export default function CheckoutPage() {
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
               <h2 className="text-xl font-semibold text-gray-900 mb-4">Booking Summary</h2>
               
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Flight</span>
-                  <span className="font-medium">
-                    {bookingData.offer.slices[0].origin.iata_code} → {bookingData.offer.slices[0].destination.iata_code}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Airline</span>
-                  <span className="font-medium">{bookingData.offer.owner.name}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Departure</span>
-                  <span className="font-medium">
-                    {format(new Date(bookingData.offer.slices[0].departure_time), 'dd MMM yyyy')}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-gray-600">Passengers</span>
-                  <span className="font-medium">{totalPassengers}</span>
-                </div>
-              </div>
+              {(() => {
+                const departureTime = getDepartureTime(bookingData.offer.slices[0]);
+                return (
+                  <div className="space-y-3 text-sm">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Flight</span>
+                      <span className="font-medium">
+                        {bookingData.offer.slices[0].origin.iata_code} → {bookingData.offer.slices[0].destination.iata_code}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Airline</span>
+                      <span className="font-medium">{bookingData.offer.owner.name}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Departure</span>
+                      <span className="font-medium">
+                        {departureTime ? format(new Date(departureTime), 'dd MMM yyyy') : 'TBD'}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Passengers</span>
+                      <span className="font-medium">{totalPassengers}</span>
+                    </div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
 

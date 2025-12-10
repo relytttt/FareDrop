@@ -144,8 +144,8 @@ export interface DuffelSlice {
     city_name?: string;
     name?: string;
   };
-  departure_time: string;
-  arrival_time: string;
+  departure_time?: string;
+  arrival_time?: string;
   duration: string;
   segments: DuffelSegment[];
 }

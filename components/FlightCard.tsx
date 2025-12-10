@@ -1,9 +1,10 @@
 'use client';
 
-import { DuffelOffer } from '@/types';
+import { DuffelOffer, DuffelSlice } from '@/types';
 import { format, isValid, parseISO } from 'date-fns';
 import { Clock, Plane } from 'lucide-react';
 import Link from 'next/link';
+import { getDepartureTime, getArrivalTime } from '@/lib/utils/flightUtils';
 
 interface FlightCardProps {
   offer: DuffelOffer & {
@@ -80,7 +81,7 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
             <div className="flex items-center gap-4 flex-1">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  {safeFormatDate(slice.departure_time, 'HH:mm')}
+                  {safeFormatDate(getDepartureTime(slice), 'HH:mm')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.origin.iata_code}</div>
               </div>
@@ -102,7 +103,7 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  {safeFormatDate(slice.arrival_time, 'HH:mm')}
+                  {safeFormatDate(getArrivalTime(slice), 'HH:mm')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.destination.iata_code}</div>
               </div>
