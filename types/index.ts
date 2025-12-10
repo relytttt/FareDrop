@@ -210,3 +210,78 @@ export interface FlightSearchFormData {
   };
   cabinClass: 'economy' | 'premium_economy' | 'business' | 'first';
 }
+
+// Phase 2B: User Accounts and Features Types
+export interface User {
+  id: string;
+  email: string;
+  full_name?: string;
+  subscription_tier: 'free' | 'premium';
+  created_at: string;
+  updated_at: string;
+}
+
+export interface SavedSearch {
+  id: string;
+  user_id: string;
+  name?: string;
+  origin: string;
+  destination: string;
+  departure_date_from?: string;
+  departure_date_to?: string;
+  return_date_from?: string;
+  return_date_to?: string;
+  passengers_adults: number;
+  passengers_children: number;
+  passengers_infants: number;
+  cabin_class: string;
+  created_at: string;
+}
+
+export interface FavoriteDeal {
+  id: string;
+  user_id: string;
+  deal_id: string;
+  deal?: Deal; // Populated via join
+  created_at: string;
+}
+
+export interface PriceAlert {
+  id: string;
+  user_id: string;
+  origin: string;
+  destination: string;
+  target_price: number;
+  current_lowest_price?: number;
+  departure_date_from?: string;
+  departure_date_to?: string;
+  is_active: boolean;
+  last_checked_at?: string;
+  triggered_at?: string;
+  created_at: string;
+}
+
+export interface PriceAlertHistory {
+  id: string;
+  alert_id: string;
+  price: number;
+  checked_at: string;
+}
+
+export interface Booking {
+  id: string;
+  user_id: string;
+  duffel_order_id?: string;
+  booking_reference?: string;
+  origin: string;
+  destination: string;
+  departure_date: string;
+  return_date?: string;
+  passengers_count: number;
+  total_amount: number;
+  currency: string;
+  status: 'confirmed' | 'cancelled' | 'completed';
+  booking_data?: any;
+  created_at: string;
+  updated_at: string;
+}

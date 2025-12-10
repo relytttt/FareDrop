@@ -1,7 +1,11 @@
+'use client';
+
+import { useState, useEffect } from 'react';
 import { Deal } from '@/types';
-import { Plane, Calendar, TrendingDown, Moon } from 'lucide-react';
+import { Plane, Calendar, TrendingDown, Moon, Heart } from 'lucide-react';
 import Link from 'next/link';
 import { formatDate, formatShortDate, calculateTripDuration } from '@/lib/utils/dateUtils';
+import { createClientComponentClient } from '@/lib/supabase';
 
 interface DealCardProps {
   deal: Deal;
@@ -9,6 +13,77 @@ interface DealCardProps {
 }
 
 export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
+  const [isFavorited, setIsFavorited] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [favoriteLoading, setFavoriteLoading] = useState(false);
+
+  const supabase = createClientComponentClient();
+
+  useEffect(() => {
+    checkAuthAndFavorite();
+  }, [deal.id]);
+
+  const checkAuthAndFavorite = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      setIsAuthenticated(!!session);
+
+      if (session) {
+        // Check if deal is favorited
+        const response = await fetch('/api/favorites');
+        const data = await response.json();
+        
+        if (response.ok && data.favorites) {
+          const favorited = data.favorites.some((fav: any) => fav.deal_id === deal.id);
+          setIsFavorited(favorited);
+        }
+      }
+    } catch (err) {
+      console.error('Error checking favorite status:', err);
+    }
+  };
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+
+    if (!isAuthenticated) {
+      // Trigger auth modal - would need to be passed via context or state management
+      alert('Please sign in to save favorites');
+      return;
+    }
+
+    setFavoriteLoading(true);
+
+    try {
+      if (isFavorited) {
+        // Remove from favorites
+        const response = await fetch(`/api/favorites?deal_id=${deal.id}`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          setIsFavorited(false);
+        }
+      } else {
+        // Add to favorites
+        const response = await fetch('/api/favorites', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ deal_id: deal.id }),
+        });
+
+        if (response.ok) {
+          setIsFavorited(true);
+        }
+      }
+    } catch (err) {
+      console.error('Error toggling favorite:', err);
+    } finally {
+      setFavoriteLoading(false);
+    }
+  };
+
   const discountPercent = deal.original_price
     ? Math.round(((deal.original_price - deal.price) / deal.original_price) * 100)
     : 0;
@@ -26,7 +101,20 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   // Compact list view variant
   if (variant === 'compact') {
     return (
-      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100">
+      <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-100 relative">
+        {/* Favorite Button */}
+        <button
+          onClick={handleFavoriteClick}
+          disabled={favoriteLoading}
+          className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+          title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+        >
+          <Heart
+            size={20}
+            className={`${isFavorited ? 'text-red-500 fill-red-500' : 'text-gray-400'} transition-colors`}
+          />
+        </button>
+
         <div className="p-4">
           <div className="flex items-center justify-between gap-4">
             {/* Route Info - Left Side */}
@@ -99,7 +187,20 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   // Default tile view variant
 
   return (
-    <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100">
+    <div className="bg-white rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow duration-300 border border-gray-100 relative">
+      {/* Favorite Button */}
+      <button
+        onClick={handleFavoriteClick}
+        disabled={favoriteLoading}
+        className="absolute top-4 right-4 z-10 p-2 bg-white rounded-full shadow-md hover:bg-gray-50 transition-colors disabled:opacity-50"
+        title={isFavorited ? 'Remove from favorites' : 'Add to favorites'}
+      >
+        <Heart
+          size={20}
+          className={`${isFavorited ? 'text-red-500 fill-red-500' : 'text-gray-400'} transition-colors`}
+        />
+      </button>
+
       {/* Deal Score Badge */}
       {deal.deal_score >= 80 && (
         <div className="bg-gradient-to-r from-primary-500 to-accent-500 text-white px-4 py-2 text-sm font-semibold flex items-center justify-between">
