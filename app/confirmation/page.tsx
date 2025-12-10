@@ -92,7 +92,11 @@ export default function ConfirmationPage() {
           <h2 className="text-2xl font-semibold text-gray-900 mb-6">Flight Details</h2>
 
           {/* Flight Info */}
-          {confirmation.offer.slices.map((slice: any, index: number) => (
+          {confirmation.offer.slices.map((slice: any, index: number) => {
+            const departureTime = getDepartureTime(slice);
+            const arrivalTime = getArrivalTime(slice);
+            
+            return (
             <div key={slice.id} className={`${index > 0 ? 'mt-6 pt-6 border-t' : ''}`}>
               <div className="flex items-center gap-4 mb-4">
                 <Plane className="w-6 h-6 text-primary-500" />
@@ -110,18 +114,19 @@ export default function ConfirmationPage() {
                 <div className="flex items-center gap-3 text-gray-700">
                   <Calendar className="w-4 h-4" />
                   <span className="font-medium">
-                    {getDepartureTime(slice) && format(new Date(getDepartureTime(slice)!), 'EEEE, dd MMMM yyyy')}
+                    {departureTime && format(new Date(departureTime), 'EEEE, dd MMMM yyyy')}
                   </span>
                 </div>
                 <div className="text-gray-600">
-                  Departure: {getDepartureTime(slice) && format(new Date(getDepartureTime(slice)!), 'HH:mm')} ({slice.origin.iata_code})
+                  Departure: {departureTime && format(new Date(departureTime), 'HH:mm')} ({slice.origin.iata_code})
                 </div>
                 <div className="text-gray-600">
-                  Arrival: {getArrivalTime(slice) && format(new Date(getArrivalTime(slice)!), 'HH:mm')} ({slice.destination.iata_code})
+                  Arrival: {arrivalTime && format(new Date(arrivalTime), 'HH:mm')} ({slice.destination.iata_code})
                 </div>
               </div>
             </div>
-          ))}
+            );
+          })}
 
           {/* Passengers */}
           <div className="mt-6 pt-6 border-t">

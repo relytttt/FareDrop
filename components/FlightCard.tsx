@@ -1,6 +1,6 @@
 'use client';
 
-import { DuffelOffer } from '@/types';
+import { DuffelOffer, DuffelSlice } from '@/types';
 import { format, isValid, parseISO } from 'date-fns';
 import { Clock, Plane } from 'lucide-react';
 import Link from 'next/link';
@@ -31,7 +31,7 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
 };
 
 // Helper to get departure time from slice or first segment
-const getDepartureTime = (slice: any): string | null => {
+const getDepartureTime = (slice: DuffelSlice): string | null => {
   // Try slice level first, then fall back to first segment
   if (slice.departure_time) return slice.departure_time;
   if (slice.segments && slice.segments.length > 0) {
@@ -41,7 +41,7 @@ const getDepartureTime = (slice: any): string | null => {
 };
 
 // Helper to get arrival time from slice or last segment
-const getArrivalTime = (slice: any): string | null => {
+const getArrivalTime = (slice: DuffelSlice): string | null => {
   // Try slice level first, then fall back to last segment
   if (slice.arrival_time) return slice.arrival_time;
   if (slice.segments && slice.segments.length > 0) {

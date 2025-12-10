@@ -4,7 +4,7 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import FlightCard from '@/components/FlightCard';
 import FlightSearch from '@/components/FlightSearch';
-import { DuffelOffer } from '@/types';
+import { DuffelOffer, DuffelSlice } from '@/types';
 import { ArrowUpDown, Filter } from 'lucide-react';
 import { parseISO, isValid } from 'date-fns';
 
@@ -16,7 +16,8 @@ function FlightsContent() {
   const [sortBy, setSortBy] = useState<'price' | 'duration' | 'departure'>('price');
 
   // Helper to get departure time from slice or first segment
-  const getDepartureTime = (slice: any): string | null => {
+  const getDepartureTime = (slice: DuffelSlice | undefined): string | null => {
+    if (!slice) return null;
     if (slice.departure_time) return slice.departure_time;
     if (slice.segments && slice.segments.length > 0) {
       return slice.segments[0].departing_at;
