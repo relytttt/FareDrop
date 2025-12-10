@@ -9,12 +9,16 @@ interface PremiumUpgradeProps {
   userId?: string;
 }
 
+// Pricing constants - update these when prices change
+const PRICING = {
+  MONTHLY_PRICE: 9.99,
+  ANNUAL_PRICE: 99.99,
+  ANNUAL_SAVINGS_PERCENT: 17,
+} as const;
+
 export default function PremiumUpgrade({ priceId, userEmail, userId }: PremiumUpgradeProps) {
   const [loading, setLoading] = useState(false);
   const [billingPeriod, setBillingPeriod] = useState<'monthly' | 'annual'>('monthly');
-
-  const monthlyPrice = 9.99;
-  const annualPrice = 99.99;
 
   const benefits = [
     {
@@ -121,7 +125,7 @@ export default function PremiumUpgrade({ priceId, userEmail, userId }: PremiumUp
           >
             Annual
             <span className="ml-2 text-xs bg-accent-500 text-white px-2 py-0.5 rounded">
-              Save 17%
+              Save {PRICING.ANNUAL_SAVINGS_PERCENT}%
             </span>
           </button>
         </div>
@@ -130,14 +134,14 @@ export default function PremiumUpgrade({ priceId, userEmail, userId }: PremiumUp
       {/* Price Display */}
       <div className="text-center mb-8">
         <div className="text-5xl font-bold text-gray-900">
-          ${billingPeriod === 'monthly' ? monthlyPrice.toFixed(2) : annualPrice.toFixed(2)}
+          ${billingPeriod === 'monthly' ? PRICING.MONTHLY_PRICE.toFixed(2) : PRICING.ANNUAL_PRICE.toFixed(2)}
         </div>
         <div className="text-gray-600 mt-2">
           per {billingPeriod === 'monthly' ? 'month' : 'year'}
         </div>
         {billingPeriod === 'annual' && (
           <div className="text-sm text-accent-600 font-medium mt-1">
-            Just ${(annualPrice / 12).toFixed(2)}/month
+            Just ${(PRICING.ANNUAL_PRICE / 12).toFixed(2)}/month
           </div>
         )}
       </div>

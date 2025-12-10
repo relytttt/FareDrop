@@ -3,6 +3,10 @@ import { stripe } from '@/lib/stripe';
 import { getServiceSupabase } from '@/lib/supabase';
 import Stripe from 'stripe';
 
+interface SubscriptionWithPeriod extends Stripe.Subscription {
+  current_period_end: number;
+}
+
 export async function POST(request: NextRequest) {
   try {
     if (!stripe) {
@@ -30,7 +34,8 @@ export async function POST(request: NextRequest) {
     // Update user in database
     if (userId) {
       const supabase = getServiceSupabase();
-      const subscription = response as any;
+      // Use type assertion through unknown for complex Stripe types
+      const subscription = response as unknown as SubscriptionWithPeriod;
       const endsAt = subscription.current_period_end 
         ? new Date(subscription.current_period_end * 1000).toISOString()
         : new Date().toISOString();
@@ -46,7 +51,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      endsAt: (response as any).current_period_end || null,
+      endsAt: (response as unknown as SubscriptionWithPeriod).current_period_end || null,
     });
   } catch (error: any) {
     console.error('Error canceling subscription:', error);

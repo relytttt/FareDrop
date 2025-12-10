@@ -3,6 +3,16 @@ import { stripe } from '@/lib/stripe';
 import { getServiceSupabase } from '@/lib/supabase';
 import Stripe from 'stripe';
 
+interface SubscriptionWithPeriod extends Stripe.Subscription {
+  current_period_end: number;
+}
+
+interface InvoiceWithSubscription extends Stripe.Invoice {
+  subscription: string | Stripe.Subscription | null;
+  payment_intent: string | Stripe.PaymentIntent | null;
+  amount_paid: number;
+}
+
 export async function POST(request: NextRequest) {
   const body = await request.text();
   const signature = request.headers.get('stripe-signature');
@@ -37,12 +47,12 @@ export async function POST(request: NextRequest) {
     switch (event.type) {
       case 'customer.subscription.created':
       case 'customer.subscription.updated': {
-        const subscription = event.data.object as Stripe.Subscription;
+        const subscription = event.data.object as SubscriptionWithPeriod;
         
         const customerId = subscription.customer as string;
         const subscriptionId = subscription.id;
         const status = subscription.status === 'active' ? 'premium' : subscription.status;
-        const currentPeriodEnd = (subscription as any).current_period_end || Date.now() / 1000;
+        const currentPeriodEnd = subscription.current_period_end || Math.floor(Date.now() / 1000);
 
         // Get user by customer ID
         const { data: user } = await supabase
@@ -92,10 +102,9 @@ export async function POST(request: NextRequest) {
       }
 
       case 'invoice.payment_succeeded': {
-        const invoice = event.data.object as Stripe.Invoice;
-        const invoiceAny = invoice as any;
+        const invoice = event.data.object as InvoiceWithSubscription;
         
-        if (invoiceAny.subscription) {
+        if (invoice.subscription) {
           const customerId = invoice.customer as string;
 
           // Get user by customer ID
@@ -107,11 +116,15 @@ export async function POST(request: NextRequest) {
 
           if (user) {
             // Create payment record for subscription payment
+            const paymentIntentId = typeof invoice.payment_intent === 'string' 
+              ? invoice.payment_intent 
+              : invoice.payment_intent?.id || null;
+
             await supabase.from('payments').insert([
               {
                 user_id: user.id,
-                stripe_payment_intent_id: invoiceAny.payment_intent as string,
-                amount: (invoiceAny.amount_paid || 0) / 100,
+                stripe_payment_intent_id: paymentIntentId,
+                amount: (invoice.amount_paid || 0) / 100,
                 currency: (invoice.currency || 'aud').toUpperCase(),
                 status: 'succeeded',
                 type: 'subscription',
