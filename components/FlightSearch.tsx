@@ -1,11 +1,12 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
-import { Plane, Users, Calendar, MapPin } from 'lucide-react';
+import { Plane, Users, Calendar, MapPin, Bookmark } from 'lucide-react';
 import { FlightSearchFormData } from '@/types';
+import { createClientComponentClient } from '@/lib/supabase';
 
 // Australian airports
 const AUSTRALIAN_AIRPORTS = [
@@ -45,6 +46,8 @@ interface FlightSearchProps {
 
 export default function FlightSearch({ onSearch, initialData, compact = false }: FlightSearchProps) {
   const router = useRouter();
+  const supabase = createClientComponentClient();
+  
   const [formData, setFormData] = useState<FlightSearchFormData>({
     origin: initialData?.origin || 'SYD',
     destination: initialData?.destination || 'DPS',
@@ -59,8 +62,56 @@ export default function FlightSearch({ onSearch, initialData, compact = false }:
   });
 
   const [showPassengers, setShowPassengers] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    checkAuth();
+  }, []);
+
+  const checkAuth = async () => {
+    const { data: { session } } = await supabase.auth.getSession();
+    setIsAuthenticated(!!session);
+  };
 
   const totalPassengers = formData.passengers.adults + formData.passengers.children + formData.passengers.infants;
+
+  const handleSaveSearch = async () => {
+    if (!isAuthenticated) {
+      alert('Please sign in to save searches');
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const response = await fetch('/api/saved-searches', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          origin: formData.origin,
+          destination: formData.destination,
+          departure_date_from: formData.departureDate?.toISOString().split('T')[0],
+          return_date_from: formData.returnDate?.toISOString().split('T')[0],
+          passengers_adults: formData.passengers.adults,
+          passengers_children: formData.passengers.children,
+          passengers_infants: formData.passengers.infants,
+          cabin_class: formData.cabinClass,
+        }),
+      });
+
+      if (response.ok) {
+        alert('Search saved successfully!');
+      } else {
+        const data = await response.json();
+        alert(data.error || 'Failed to save search');
+      }
+    } catch (err) {
+      console.error('Error saving search:', err);
+      alert('Failed to save search');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -298,14 +349,25 @@ export default function FlightSearch({ onSearch, initialData, compact = false }:
             </select>
           </div>
 
-          {/* Search Button */}
-          <div className="flex items-end">
+          {/* Search and Save Buttons */}
+          <div className="flex items-end gap-2">
             <button
               type="submit"
-              className="w-full bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
+              className="flex-1 bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
             >
               Search Flights
             </button>
+            {isAuthenticated && (
+              <button
+                type="button"
+                onClick={handleSaveSearch}
+                disabled={saving}
+                className="p-3 border-2 border-primary-500 text-primary-600 rounded-lg hover:bg-primary-50 transition-colors disabled:opacity-50"
+                title="Save this search"
+              >
+                <Bookmark size={24} className={saving ? 'animate-pulse' : ''} />
+              </button>
+            )}
           </div>
         </div>
       </form>
