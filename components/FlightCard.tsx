@@ -4,6 +4,7 @@ import { DuffelOffer, DuffelSlice } from '@/types';
 import { format, isValid, parseISO } from 'date-fns';
 import { Clock, Plane } from 'lucide-react';
 import Link from 'next/link';
+import { getDepartureTime, getArrivalTime } from '@/lib/utils/flightUtils';
 
 interface FlightCardProps {
   offer: DuffelOffer & {
@@ -28,26 +29,6 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
   } catch {
     return fallback;
   }
-};
-
-// Helper to get departure time from slice or first segment
-const getDepartureTime = (slice: DuffelSlice): string | null => {
-  // Try slice level first, then fall back to first segment
-  if (slice.departure_time) return slice.departure_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[0].departing_at;
-  }
-  return null;
-};
-
-// Helper to get arrival time from slice or last segment
-const getArrivalTime = (slice: DuffelSlice): string | null => {
-  // Try slice level first, then fall back to last segment
-  if (slice.arrival_time) return slice.arrival_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[slice.segments.length - 1].arriving_at;
-  }
-  return null;
 };
 
 export default function FlightCard({ offer, searchParams }: FlightCardProps) {

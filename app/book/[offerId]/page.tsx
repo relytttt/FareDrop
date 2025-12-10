@@ -9,24 +9,7 @@ import PriceBreakdown from '@/components/PriceBreakdown';
 import AddOns from '@/components/AddOns';
 import { format } from 'date-fns';
 import { Plane, Calendar, Clock } from 'lucide-react';
-
-// Helper to get departure time from slice or first segment
-const getDepartureTime = (slice: any): string | null => {
-  if (slice.departure_time) return slice.departure_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[0].departing_at;
-  }
-  return null;
-};
-
-// Helper to get arrival time from slice or last segment
-const getArrivalTime = (slice: any): string | null => {
-  if (slice.arrival_time) return slice.arrival_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[slice.segments.length - 1].arriving_at;
-  }
-  return null;
-};
+import { getDepartureTime, getArrivalTime } from '@/lib/utils/flightUtils';
 
 export default function BookingPage() {
   const params = useParams();

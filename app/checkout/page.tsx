@@ -6,15 +6,7 @@ import PriceBreakdown from '@/components/PriceBreakdown';
 import { SERVICE_FEE, MARKUP_PERCENTAGE, calculateTotalPrice } from '@/lib/duffel';
 import { format } from 'date-fns';
 import { CreditCard, Lock } from 'lucide-react';
-
-// Helper to get departure time from slice or first segment
-const getDepartureTime = (slice: any): string | null => {
-  if (slice.departure_time) return slice.departure_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[0].departing_at;
-  }
-  return null;
-};
+import { getDepartureTime } from '@/lib/utils/flightUtils';
 
 export default function CheckoutPage() {
   const router = useRouter();

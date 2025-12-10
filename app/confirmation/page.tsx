@@ -5,24 +5,7 @@ import { useRouter } from 'next/navigation';
 import { format } from 'date-fns';
 import { CheckCircle, Download, Plane, Calendar, Users, Mail } from 'lucide-react';
 import TripUpsells from '@/components/TripUpsells';
-
-// Helper to get departure time from slice or first segment
-const getDepartureTime = (slice: any): string | null => {
-  if (slice.departure_time) return slice.departure_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[0].departing_at;
-  }
-  return null;
-};
-
-// Helper to get arrival time from slice or last segment
-const getArrivalTime = (slice: any): string | null => {
-  if (slice.arrival_time) return slice.arrival_time;
-  if (slice.segments && slice.segments.length > 0) {
-    return slice.segments[slice.segments.length - 1].arriving_at;
-  }
-  return null;
-};
+import { getDepartureTime, getArrivalTime } from '@/lib/utils/flightUtils';
 
 export default function ConfirmationPage() {
   const router = useRouter();

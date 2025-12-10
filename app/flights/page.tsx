@@ -7,6 +7,7 @@ import FlightSearch from '@/components/FlightSearch';
 import { DuffelOffer, DuffelSlice } from '@/types';
 import { ArrowUpDown, Filter } from 'lucide-react';
 import { parseISO, isValid } from 'date-fns';
+import { getDepartureTime } from '@/lib/utils/flightUtils';
 
 function FlightsContent() {
   const searchParams = useSearchParams();
@@ -14,16 +15,6 @@ function FlightsContent() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [sortBy, setSortBy] = useState<'price' | 'duration' | 'departure'>('price');
-
-  // Helper to get departure time from slice or first segment
-  const getDepartureTime = (slice: DuffelSlice | undefined): string | null => {
-    if (!slice) return null;
-    if (slice.departure_time) return slice.departure_time;
-    if (slice.segments && slice.segments.length > 0) {
-      return slice.segments[0].departing_at;
-    }
-    return null;
-  };
 
   // Helper to safely parse date strings and return timestamp
   const getSafeTimestamp = (dateString: string | null | undefined): number => {
