@@ -3,16 +3,16 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import PriceBreakdown from '@/components/PriceBreakdown';
+import PaymentForm from '@/components/PaymentForm';
 import { SERVICE_FEE, MARKUP_PERCENTAGE, calculateTotalPrice } from '@/lib/duffel';
 import { format } from 'date-fns';
-import { CreditCard, Lock } from 'lucide-react';
+import { Lock } from 'lucide-react';
 import { getDepartureTime } from '@/lib/utils/flightUtils';
 
 export default function CheckoutPage() {
   const router = useRouter();
   const [bookingData, setBookingData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [processing, setProcessing] = useState(false);
 
   useEffect(() => {
     // Load booking data from localStorage
@@ -25,41 +25,6 @@ export default function CheckoutPage() {
     }
     setLoading(false);
   }, []);
-
-  const handlePayment = async () => {
-    setProcessing(true);
-
-    try {
-      // In a real implementation, this would:
-      // 1. Create a Stripe payment intent
-      // 2. Process payment
-      // 3. Create Duffel order
-      // 4. Store order in database
-      
-      // For MVP, we'll simulate a successful payment
-      await new Promise(resolve => setTimeout(resolve, 2000));
-
-      // Create mock booking confirmation
-      const confirmation = {
-        bookingReference: `FD${Date.now().toString().slice(-8)}`,
-        ...bookingData,
-        bookedAt: new Date().toISOString(),
-        status: 'confirmed',
-      };
-
-      // Store confirmation
-      localStorage.setItem('bookingConfirmation', JSON.stringify(confirmation));
-      localStorage.removeItem('pendingBooking');
-
-      // Navigate to confirmation page
-      router.push('/confirmation');
-    } catch (error) {
-      console.error('Payment error:', error);
-      alert('Payment failed. Please try again.');
-    } finally {
-      setProcessing(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -78,6 +43,8 @@ export default function CheckoutPage() {
 
   const basePrice = parseFloat(bookingData.offer.display_price || bookingData.offer.total_amount);
   const totalPassengers = bookingData.passengers.length;
+  const totalAmount = calculateTotalPrice(basePrice) + (bookingData.addOnsTotal || 0);
+  const route = `${bookingData.offer.slices[0].origin.iata_code} → ${bookingData.offer.slices[0].destination.iata_code}`;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -96,24 +63,14 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* Payment Form (MVP - Placeholder) */}
-            <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
-              <h2 className="text-xl font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <CreditCard className="w-5 h-5" />
-                Payment Details
-              </h2>
-
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 text-center">
-                <div className="text-4xl mb-4">🚧</div>
-                <h3 className="font-semibold text-gray-900 mb-2">Payment Integration Coming Soon</h3>
-                <p className="text-gray-600 mb-4">
-                  Stripe payment integration will be added in Phase 2. 
-                  For now, click "Complete Booking" to see the confirmation page.
-                </p>
-              </div>
-
-              {/* Future: Stripe Elements will go here */}
-            </div>
+            {/* Payment Form */}
+            <PaymentForm
+              offerId={bookingData.offerId}
+              totalAmount={totalAmount}
+              currency={bookingData.offer.total_currency}
+              passengerCount={totalPassengers}
+              route={route}
+            />
 
             {/* Booking Summary */}
             <div className="bg-white rounded-lg shadow-md p-6 border border-gray-200">
@@ -157,26 +114,6 @@ export default function CheckoutPage() {
               addOnsTotal={bookingData.addOnsTotal || 0}
               passengerCount={totalPassengers}
             />
-
-            <button
-              onClick={handlePayment}
-              disabled={processing}
-              className="w-full mt-6 bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-4 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {processing ? (
-                <span className="flex items-center justify-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                  Processing...
-                </span>
-              ) : (
-                'Complete Booking'
-              )}
-            </button>
-
-            <p className="text-xs text-gray-500 text-center mt-4">
-              By completing this booking, you agree to our{' '}
-              <a href="#" className="text-primary-600 hover:underline">terms and conditions</a>
-            </p>
 
             <button
               onClick={() => router.back()}
