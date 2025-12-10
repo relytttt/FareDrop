@@ -30,6 +30,26 @@ const safeFormatDate = (dateString: string | null | undefined, formatStr: string
   }
 };
 
+// Helper to get departure time from slice or first segment
+const getDepartureTime = (slice: any): string | null => {
+  // Try slice level first, then fall back to first segment
+  if (slice.departure_time) return slice.departure_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[0].departing_at;
+  }
+  return null;
+};
+
+// Helper to get arrival time from slice or last segment
+const getArrivalTime = (slice: any): string | null => {
+  // Try slice level first, then fall back to last segment
+  if (slice.arrival_time) return slice.arrival_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[slice.segments.length - 1].arriving_at;
+  }
+  return null;
+};
+
 export default function FlightCard({ offer, searchParams }: FlightCardProps) {
   const formatDuration = (duration: string) => {
     // Duration is in format PT2H30M
@@ -80,7 +100,7 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
             <div className="flex items-center gap-4 flex-1">
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  {safeFormatDate(slice.departure_time, 'HH:mm')}
+                  {safeFormatDate(getDepartureTime(slice), 'HH:mm')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.origin.iata_code}</div>
               </div>
@@ -102,7 +122,7 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
 
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
-                  {safeFormatDate(slice.arrival_time, 'HH:mm')}
+                  {safeFormatDate(getArrivalTime(slice), 'HH:mm')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.destination.iata_code}</div>
               </div>

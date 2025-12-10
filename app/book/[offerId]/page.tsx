@@ -10,6 +10,24 @@ import AddOns from '@/components/AddOns';
 import { format } from 'date-fns';
 import { Plane, Calendar, Clock } from 'lucide-react';
 
+// Helper to get departure time from slice or first segment
+const getDepartureTime = (slice: any): string | null => {
+  if (slice.departure_time) return slice.departure_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[0].departing_at;
+  }
+  return null;
+};
+
+// Helper to get arrival time from slice or last segment
+const getArrivalTime = (slice: any): string | null => {
+  if (slice.arrival_time) return slice.arrival_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[slice.segments.length - 1].arriving_at;
+  }
+  return null;
+};
+
 export default function BookingPage() {
   const params = useParams();
   const router = useRouter();
@@ -175,11 +193,11 @@ export default function BookingPage() {
                   <div className="ml-9 text-sm text-gray-600 space-y-1">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      {format(new Date(slice.departure_time), 'EEE, dd MMM yyyy')}
+                      {getDepartureTime(slice) && format(new Date(getDepartureTime(slice)!), 'EEE, dd MMM yyyy')}
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      {format(new Date(slice.departure_time), 'HH:mm')} - {format(new Date(slice.arrival_time), 'HH:mm')}
+                      {getDepartureTime(slice) && format(new Date(getDepartureTime(slice)!), 'HH:mm')} - {getArrivalTime(slice) && format(new Date(getArrivalTime(slice)!), 'HH:mm')}
                     </div>
                   </div>
                 </div>
