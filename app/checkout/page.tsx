@@ -136,7 +136,7 @@ export default function CheckoutPage() {
                     <div className="flex justify-between">
                       <span className="text-gray-600">Departure</span>
                       <span className="font-medium">
-                        {departureTime && format(new Date(departureTime), 'dd MMM yyyy')}
+                        {departureTime ? format(new Date(departureTime), 'dd MMM yyyy') : 'TBD'}
                       </span>
                     </div>
                     <div className="flex justify-between">

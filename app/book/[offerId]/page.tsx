@@ -180,11 +180,11 @@ export default function BookingPage() {
                   <div className="ml-9 text-sm text-gray-600 space-y-1">
                     <div className="flex items-center gap-2">
                       <Calendar className="w-4 h-4" />
-                      {departureTime && format(new Date(departureTime), 'EEE, dd MMM yyyy')}
+                      {departureTime ? format(new Date(departureTime), 'EEE, dd MMM yyyy') : 'TBD'}
                     </div>
                     <div className="flex items-center gap-2">
                       <Clock className="w-4 h-4" />
-                      {departureTime && format(new Date(departureTime), 'HH:mm')} - {arrivalTime && format(new Date(arrivalTime), 'HH:mm')}
+                      {departureTime ? format(new Date(departureTime), 'HH:mm') : '--:--'} - {arrivalTime ? format(new Date(arrivalTime), 'HH:mm') : '--:--'}
                     </div>
                   </div>
                 </div>

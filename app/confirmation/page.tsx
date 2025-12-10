@@ -97,14 +97,14 @@ export default function ConfirmationPage() {
                 <div className="flex items-center gap-3 text-gray-700">
                   <Calendar className="w-4 h-4" />
                   <span className="font-medium">
-                    {departureTime && format(new Date(departureTime), 'EEEE, dd MMMM yyyy')}
+                    {departureTime ? format(new Date(departureTime), 'EEEE, dd MMMM yyyy') : 'TBD'}
                   </span>
                 </div>
                 <div className="text-gray-600">
-                  Departure: {departureTime && format(new Date(departureTime), 'HH:mm')} ({slice.origin.iata_code})
+                  Departure: {departureTime ? format(new Date(departureTime), 'HH:mm') : '--:--'} ({slice.origin.iata_code})
                 </div>
                 <div className="text-gray-600">
-                  Arrival: {arrivalTime && format(new Date(arrivalTime), 'HH:mm')} ({slice.destination.iata_code})
+                  Arrival: {arrivalTime ? format(new Date(arrivalTime), 'HH:mm') : '--:--'} ({slice.destination.iata_code})
                 </div>
               </div>
             </div>
