@@ -7,6 +7,15 @@ import { SERVICE_FEE, MARKUP_PERCENTAGE, calculateTotalPrice } from '@/lib/duffe
 import { format } from 'date-fns';
 import { CreditCard, Lock } from 'lucide-react';
 
+// Helper to get departure time from slice or first segment
+const getDepartureTime = (slice: any): string | null => {
+  if (slice.departure_time) return slice.departure_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[0].departing_at;
+  }
+  return null;
+};
+
 export default function CheckoutPage() {
   const router = useRouter();
   const [bookingData, setBookingData] = useState<any>(null);
@@ -132,7 +141,7 @@ export default function CheckoutPage() {
                 <div className="flex justify-between">
                   <span className="text-gray-600">Departure</span>
                   <span className="font-medium">
-                    {format(new Date(bookingData.offer.slices[0].departure_time), 'dd MMM yyyy')}
+                    {getDepartureTime(bookingData.offer.slices[0]) && format(new Date(getDepartureTime(bookingData.offer.slices[0])!), 'dd MMM yyyy')}
                   </span>
                 </div>
                 <div className="flex justify-between">

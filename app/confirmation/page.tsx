@@ -6,6 +6,24 @@ import { format } from 'date-fns';
 import { CheckCircle, Download, Plane, Calendar, Users, Mail } from 'lucide-react';
 import TripUpsells from '@/components/TripUpsells';
 
+// Helper to get departure time from slice or first segment
+const getDepartureTime = (slice: any): string | null => {
+  if (slice.departure_time) return slice.departure_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[0].departing_at;
+  }
+  return null;
+};
+
+// Helper to get arrival time from slice or last segment
+const getArrivalTime = (slice: any): string | null => {
+  if (slice.arrival_time) return slice.arrival_time;
+  if (slice.segments && slice.segments.length > 0) {
+    return slice.segments[slice.segments.length - 1].arriving_at;
+  }
+  return null;
+};
+
 export default function ConfirmationPage() {
   const router = useRouter();
   const [confirmation, setConfirmation] = useState<any>(null);
@@ -92,14 +110,14 @@ export default function ConfirmationPage() {
                 <div className="flex items-center gap-3 text-gray-700">
                   <Calendar className="w-4 h-4" />
                   <span className="font-medium">
-                    {format(new Date(slice.departure_time), 'EEEE, dd MMMM yyyy')}
+                    {getDepartureTime(slice) && format(new Date(getDepartureTime(slice)!), 'EEEE, dd MMMM yyyy')}
                   </span>
                 </div>
                 <div className="text-gray-600">
-                  Departure: {format(new Date(slice.departure_time), 'HH:mm')} ({slice.origin.iata_code})
+                  Departure: {getDepartureTime(slice) && format(new Date(getDepartureTime(slice)!), 'HH:mm')} ({slice.origin.iata_code})
                 </div>
                 <div className="text-gray-600">
-                  Arrival: {format(new Date(slice.arrival_time), 'HH:mm')} ({slice.destination.iata_code})
+                  Arrival: {getArrivalTime(slice) && format(new Date(getArrivalTime(slice)!), 'HH:mm')} ({slice.destination.iata_code})
                 </div>
               </div>
             </div>
