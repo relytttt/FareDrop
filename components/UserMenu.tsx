@@ -176,7 +176,7 @@ export default function UserMenu({ onLoginClick }: UserMenuProps) {
           </div>
 
           {/* Admin Dashboard - Only for admins */}
-          {(user.role === 'admin' || user.email?.endsWith('@faredrop.com')) && (
+          {(user.role === 'admin' || user.email?.endsWith('@faredrop.com') || user.email?.endsWith('@faredrop.com.au')) && (
             <>
               <div className="border-t border-gray-200"></div>
               <div className="py-2">

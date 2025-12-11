@@ -236,16 +236,22 @@ export default function FlightSearch({ onSearch, initialData, compact = false }:
                 checked={flexibleDates}
                 onChange={(e) => setFlexibleDates(e.target.checked)}
                 className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                aria-describedby="flexible-dates-help"
               />
               <span className="text-sm text-gray-600">
                 Flexible dates (±3 days)
               </span>
             </label>
             <div className="ml-2 group relative">
-              <div className="w-4 h-4 rounded-full border border-gray-400 text-gray-400 text-xs flex items-center justify-center cursor-help">
+              <button
+                type="button"
+                className="w-4 h-4 rounded-full border border-gray-400 text-gray-400 text-xs flex items-center justify-center cursor-help focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-label="Help about flexible dates"
+                title="Search flights 3 days before and after your selected dates for more options"
+              >
                 ?
-              </div>
-              <div className="absolute hidden group-hover:block bottom-full left-0 mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10">
+              </button>
+              <div id="flexible-dates-help" className="absolute hidden group-hover:block group-focus-within:block bottom-full left-0 mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10" role="tooltip">
                 Search flights 3 days before and after your selected dates for more options
               </div>
             </div>

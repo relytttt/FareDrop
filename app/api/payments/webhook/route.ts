@@ -126,11 +126,13 @@ export async function POST(request: NextRequest) {
             console.log('Confirmation email sent');
           }
 
-        } catch (error: any) {
+        } catch (error: unknown) {
           console.error('Error creating Duffel order:', error);
           
           // Create a failed booking record for tracking
           try {
+            const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+            console.error('Failed to create Duffel order:', errorMessage);
             const bookingData = {
               user_id: user_id || null,
               duffel_order_id: `failed_${offer_id}_${Date.now()}`,
