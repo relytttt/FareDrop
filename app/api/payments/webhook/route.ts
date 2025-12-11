@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         
         // Extract metadata
-        const { offer_id, passenger_count, route } = session.metadata || {};
+        const { offer_id, passengers_json, user_id, departure_date, return_date } = session.metadata || {};
         
         if (!offer_id) {
           console.error('No offer_id in session metadata');
@@ -51,24 +51,33 @@ export async function POST(request: NextRequest) {
         const paymentIntentId = session.payment_intent as string;
         
         try {
-          // In a real implementation, you would:
-          // 1. Retrieve the full offer and passenger details from a temporary store or database
-          // 2. Create the Duffel order
-          // 3. Save the booking to the database
-          // 4. Send confirmation email
+          // Parse passengers from metadata
+          const passengers = passengers_json ? JSON.parse(passengers_json) : [];
           
-          // For now, we'll create a placeholder booking record
+          if (passengers.length === 0) {
+            throw new Error('No passenger data found in session metadata');
+          }
+
+          // CREATE ACTUAL DUFFEL ORDER
+          console.log('Creating Duffel order for offer:', offer_id);
+          const duffelOrder = await createOrder(offer_id, passengers);
+          
+          console.log('Duffel order created:', duffelOrder.id);
+
+          // Save booking with REAL Duffel data
           const bookingData = {
+            user_id: user_id || null,
+            duffel_order_id: duffelOrder.id,
+            booking_reference: duffelOrder.booking_reference,
             stripe_payment_id: paymentIntentId,
-            total_amount: (session.amount_total || 0) / 100,
-            currency: (session.currency || 'aud').toUpperCase(),
+            total_amount: parseFloat(duffelOrder.total_amount),
+            currency: duffelOrder.total_currency,
             status: 'confirmed',
-            origin: route?.split(' → ')[0] || 'Unknown',
-            destination: route?.split(' → ')[1] || 'Unknown',
-            departure_date: new Date().toISOString().split('T')[0], // Placeholder
-            passenger_count: parseInt(passenger_count || '1'),
-            booking_reference: `FD${Date.now().toString().slice(-8)}`, // Generate temporary reference
-            duffel_order_id: `pending_${offer_id}`, // Placeholder until real order created
+            origin: duffelOrder.slices[0]?.origin.iata_code || 'Unknown',
+            destination: duffelOrder.slices[0]?.destination.iata_code || 'Unknown',
+            departure_date: duffelOrder.slices[0]?.segments[0]?.departing_at?.split('T')[0] || departure_date,
+            return_date: duffelOrder.slices[1]?.segments[0]?.departing_at?.split('T')[0] || return_date || null,
+            passenger_count: passengers.length,
           };
 
           const { data: booking, error: bookingError } = await supabase
@@ -79,7 +88,10 @@ export async function POST(request: NextRequest) {
 
           if (bookingError) {
             console.error('Error creating booking:', bookingError);
+            throw bookingError;
           }
+
+          console.log('Booking created successfully:', booking.id);
 
           // Create payment record
           const paymentData = {
@@ -99,11 +111,48 @@ export async function POST(request: NextRequest) {
             console.error('Error creating payment record:', paymentError);
           }
 
-          // TODO: Send confirmation email using Resend
-          // TODO: Create actual Duffel order
+          // SEND CONFIRMATION EMAIL
+          if (session.customer_email || passengers[0]?.email) {
+            const { sendBookingConfirmationEmail } = await import('@/lib/email');
+            
+            await sendBookingConfirmationEmail({
+              to: session.customer_email || passengers[0]?.email,
+              bookingReference: duffelOrder.booking_reference,
+              flightDetails: duffelOrder.slices,
+              totalAmount: `${duffelOrder.total_currency} ${parseFloat(duffelOrder.total_amount).toFixed(2)}`,
+              passengerNames: passengers.map((p: any) => `${p.given_name} ${p.family_name}`).join(', '),
+            });
+            
+            console.log('Confirmation email sent');
+          }
 
-        } catch (error) {
-          console.error('Error processing successful payment:', error);
+        } catch (error: any) {
+          console.error('Error creating Duffel order:', error);
+          
+          // Create a failed booking record for tracking
+          try {
+            const bookingData = {
+              user_id: user_id || null,
+              duffel_order_id: `failed_${offer_id}_${Date.now()}`,
+              booking_reference: `ERROR_${Date.now().toString().slice(-8)}`,
+              stripe_payment_id: paymentIntentId,
+              total_amount: (session.amount_total || 0) / 100,
+              currency: (session.currency || 'aud').toUpperCase(),
+              status: 'failed',
+              origin: 'Unknown',
+              destination: 'Unknown',
+              departure_date: departure_date || new Date().toISOString().split('T')[0],
+              return_date: return_date || null,
+              passenger_count: passengers_json ? JSON.parse(passengers_json).length : 1,
+            };
+
+            await supabase.from('bookings').insert([bookingData]);
+          } catch (fallbackError) {
+            console.error('Error creating fallback booking record:', fallbackError);
+          }
+          
+          // Note: In production, you might want to automatically refund the payment
+          // await stripe.refunds.create({ payment_intent: paymentIntentId });
         }
 
         break;

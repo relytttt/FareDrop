@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import AuthModalWrapper from "@/components/AuthModalWrapper";
 
 export const metadata: Metadata = {
   title: "FareDrop - Find the Best Flight Deals",
@@ -59,6 +61,9 @@ export default function RootLayout({
           {children}
         </main>
         <Footer />
+        <Suspense fallback={null}>
+          <AuthModalWrapper />
+        </Suspense>
       </body>
     </html>
   );

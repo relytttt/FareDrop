@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { User, LogOut, Settings, Bookmark, Heart, Bell, ShoppingBag } from 'lucide-react';
+import { User, LogOut, Settings, Bookmark, Heart, Bell, ShoppingBag, LayoutDashboard } from 'lucide-react';
 import { createClientComponentClient } from '@/lib/supabase';
 import type { User as UserType } from '@/types';
 
@@ -174,6 +174,23 @@ export default function UserMenu({ onLoginClick }: UserMenuProps) {
               <span>Price Alerts</span>
             </Link>
           </div>
+
+          {/* Admin Dashboard - Only for admins */}
+          {(user.role === 'admin' || user.email?.endsWith('@faredrop.com')) && (
+            <>
+              <div className="border-t border-gray-200"></div>
+              <div className="py-2">
+                <Link
+                  href="/admin/dashboard"
+                  className="flex items-center gap-3 px-4 py-2 hover:bg-gray-50 transition-colors text-primary-600 font-medium"
+                  onClick={() => setIsOpen(false)}
+                >
+                  <LayoutDashboard size={18} />
+                  <span>Admin Dashboard</span>
+                </Link>
+              </div>
+            </>
+          )}
 
           {/* Logout */}
           <div className="border-t border-gray-200 pt-2">
