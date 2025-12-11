@@ -217,6 +217,7 @@ export interface User {
   email: string;
   full_name?: string;
   subscription_tier: 'free' | 'premium';
+  role?: 'user' | 'admin';
   created_at: string;
   updated_at: string;
 }

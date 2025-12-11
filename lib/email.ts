@@ -293,22 +293,34 @@ export async function sendPriceAlertEmail({
 }
 
 /**
- * Sends a booking confirmation email
+ * Sends a booking confirmation email with enhanced flight details
  */
 export async function sendBookingConfirmationEmail({
-  user,
-  booking,
-}: SendBookingConfirmationEmailParams) {
+  to,
+  bookingReference,
+  flightDetails,
+  totalAmount,
+  passengerNames,
+}: {
+  to: string;
+  bookingReference: string;
+  flightDetails: any[];
+  totalAmount: string;
+  passengerNames: string;
+}) {
   if (!process.env.RESEND_API_KEY) {
     console.warn('RESEND_API_KEY not set. Skipping email send.');
     return { success: false, message: 'Email API not configured' };
   }
 
+  const outboundFlight = flightDetails[0];
+  const returnFlight = flightDetails[1];
+
   try {
     const data = await resend.emails.send({
-      from: 'FareDrop <bookings@faredrop.com>',
-      to: [user.email],
-      subject: `Booking Confirmation - ${booking.origin} → ${booking.destination}`,
+      from: 'FareDrop <bookings@faredrop.com.au>',
+      to: [to],
+      subject: `✈️ Booking Confirmed - ${bookingReference}`,
       html: `
         <!DOCTYPE html>
         <html>
@@ -318,38 +330,69 @@ export async function sendBookingConfirmationEmail({
             <title>Booking Confirmation</title>
           </head>
           <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px;">
-            <div style="background: linear-gradient(135deg, #00a0a0 0%, #0077e6 100%); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
-              <h1 style="color: white; margin: 0; font-size: 28px;">✅ Booking Confirmed!</h1>
+            <div style="background: linear-gradient(135deg, #00a0a0, #0077e6); padding: 30px; text-align: center; border-radius: 8px 8px 0 0;">
+              <h1 style="color: white; margin: 0; font-size: 28px;">Booking Confirmed! ✈️</h1>
             </div>
             
             <div style="background: #f8f9fa; padding: 30px; border-radius: 0 0 8px 8px;">
-              <div style="background: white; padding: 25px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
-                <p style="font-size: 18px; margin-top: 0;">Your booking has been confirmed!</p>
-                
-                <div style="background: #f0f8ff; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #0077e6;">
-                  <h2 style="color: #00a0a0; margin-top: 0;">${booking.origin} → ${booking.destination}</h2>
-                  
-                  ${booking.booking_reference ? `<p style="margin: 10px 0;"><strong>Booking Reference:</strong> ${booking.booking_reference}</p>` : ''}
-                  <p style="margin: 10px 0;"><strong>Departure:</strong> ${new Date(booking.departure_date).toLocaleDateString()}</p>
-                  ${booking.return_date ? `<p style="margin: 10px 0;"><strong>Return:</strong> ${new Date(booking.return_date).toLocaleDateString()}</p>` : ''}
-                  <p style="margin: 10px 0;"><strong>Passengers:</strong> ${booking.passengers_count}</p>
-                  <p style="margin: 10px 0;"><strong>Total Amount:</strong> ${booking.currency} $${booking.total_amount}</p>
-                </div>
-                
-                <p>Your flight details and e-ticket will be available in your account.</p>
-                
-                <a href="${process.env.NEXT_PUBLIC_SITE_URL}/account/bookings" style="display: inline-block; background: linear-gradient(135deg, #00a0a0 0%, #0077e6 100%); color: white; padding: 15px 40px; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px;">View Booking Details</a>
-                
-                <div style="margin-top: 30px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
-                  <p style="margin: 0; font-weight: bold; color: #856404;">Important:</p>
-                  <p style="margin: 10px 0 0 0; color: #856404;">Please check your email for additional information from the airline. Make sure to check in online 24 hours before your flight.</p>
-                </div>
+              <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h2 style="color: #1f2937; margin-top: 0;">Booking Reference</h2>
+                <p style="font-size: 24px; font-weight: bold; color: #00a0a0; margin: 0;">${bookingReference}</p>
               </div>
               
-              <div style="text-align: center; margin-top: 30px; font-size: 12px; color: #666;">
-                <p>Need help? <a href="${process.env.NEXT_PUBLIC_SITE_URL}/contact" style="color: #0077e6;">Contact our support team</a></p>
-                <p>Happy travels!</p>
+              <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="color: #1f2937; margin-top: 0;">Passengers</h3>
+                <p style="color: #4b5563;">${passengerNames}</p>
               </div>
+              
+              <div style="background: white; border-radius: 8px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="color: #1f2937; margin-top: 0;">Flight Details</h3>
+                
+                ${outboundFlight ? `
+                  <div style="margin-bottom: 15px; padding: 15px; background: #f0f8ff; border-left: 4px solid #0077e6; border-radius: 4px;">
+                    <p style="margin: 5px 0; font-weight: bold; color: #00a0a0;">Outbound Flight</p>
+                    <p style="margin: 5px 0;"><strong>Route:</strong> ${outboundFlight.origin?.iata_code || 'N/A'} → ${outboundFlight.destination?.iata_code || 'N/A'}</p>
+                    <p style="margin: 5px 0;"><strong>Date:</strong> ${outboundFlight.segments?.[0]?.departing_at ? new Date(outboundFlight.segments[0].departing_at).toLocaleDateString('en-AU', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}</p>
+                    <p style="margin: 5px 0;"><strong>Departure:</strong> ${outboundFlight.segments?.[0]?.departing_at ? new Date(outboundFlight.segments[0].departing_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
+                    <p style="margin: 5px 0;"><strong>Arrival:</strong> ${outboundFlight.segments?.[outboundFlight.segments.length - 1]?.arriving_at ? new Date(outboundFlight.segments[outboundFlight.segments.length - 1].arriving_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
+                    ${outboundFlight.segments?.length > 1 ? `<p style="margin: 5px 0; color: #6b7280;"><strong>Stops:</strong> ${outboundFlight.segments.length - 1}</p>` : '<p style="margin: 5px 0; color: #22c55e;"><strong>Direct flight</strong></p>'}
+                  </div>
+                ` : ''}
+                
+                ${returnFlight ? `
+                  <div style="padding: 15px; background: #f0f8ff; border-left: 4px solid #0077e6; border-radius: 4px;">
+                    <p style="margin: 5px 0; font-weight: bold; color: #00a0a0;">Return Flight</p>
+                    <p style="margin: 5px 0;"><strong>Route:</strong> ${returnFlight.origin?.iata_code || 'N/A'} → ${returnFlight.destination?.iata_code || 'N/A'}</p>
+                    <p style="margin: 5px 0;"><strong>Date:</strong> ${returnFlight.segments?.[0]?.departing_at ? new Date(returnFlight.segments[0].departing_at).toLocaleDateString('en-AU', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}</p>
+                    <p style="margin: 5px 0;"><strong>Departure:</strong> ${returnFlight.segments?.[0]?.departing_at ? new Date(returnFlight.segments[0].departing_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
+                    <p style="margin: 5px 0;"><strong>Arrival:</strong> ${returnFlight.segments?.[returnFlight.segments.length - 1]?.arriving_at ? new Date(returnFlight.segments[returnFlight.segments.length - 1].arriving_at).toLocaleTimeString('en-AU', { hour: '2-digit', minute: '2-digit' }) : 'N/A'}</p>
+                    ${returnFlight.segments?.length > 1 ? `<p style="margin: 5px 0; color: #6b7280;"><strong>Stops:</strong> ${returnFlight.segments.length - 1}</p>` : '<p style="margin: 5px 0; color: #22c55e;"><strong>Direct flight</strong></p>'}
+                  </div>
+                ` : ''}
+              </div>
+              
+              <div style="background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                <h3 style="color: #1f2937; margin-top: 0;">Total Paid</h3>
+                <p style="font-size: 20px; font-weight: bold; color: #00a0a0;">${totalAmount}</p>
+              </div>
+
+              <div style="margin-top: 20px; padding: 20px; background: #fff3cd; border-radius: 8px; border-left: 4px solid #ffc107;">
+                <p style="margin: 0; font-weight: bold; color: #856404;">Important Reminders:</p>
+                <ul style="margin: 10px 0 0 0; padding-left: 20px; color: #856404;">
+                  <li>Check in online 24-48 hours before your flight</li>
+                  <li>Arrive at the airport at least 2-3 hours before departure</li>
+                  <li>Bring a valid passport and any required visas</li>
+                  <li>Review airline baggage policies before packing</li>
+                </ul>
+              </div>
+            </div>
+            
+            <div style="padding: 20px; text-align: center; color: #6b7280;">
+              <p style="margin: 10px 0;">Thank you for booking with FareDrop!</p>
+              <p style="margin: 10px 0;">Questions? Reply to this email or visit our support center.</p>
+              <p style="margin: 10px 0; font-size: 12px;">
+                <a href="${process.env.NEXT_PUBLIC_SITE_URL}/account/bookings" style="color: #0077e6; text-decoration: none;">View Booking Details</a>
+              </p>
             </div>
           </body>
         </html>

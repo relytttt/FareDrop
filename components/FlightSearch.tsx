@@ -64,6 +64,7 @@ export default function FlightSearch({ onSearch, initialData, compact = false }:
   const [showPassengers, setShowPassengers] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [saving, setSaving] = useState(false);
+  const [flexibleDates, setFlexibleDates] = useState(false);
 
   useEffect(() => {
     checkAuth();
@@ -134,6 +135,7 @@ export default function FlightSearch({ onSearch, initialData, compact = false }:
         children: formData.passengers.children.toString(),
         infants: formData.passengers.infants.toString(),
         cabinClass: formData.cabinClass,
+        ...(flexibleDates && { flexibleDates: 'true' }),
       });
       router.push(`/flights?${params.toString()}`);
     }
@@ -226,6 +228,35 @@ export default function FlightSearch({ onSearch, initialData, compact = false }:
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          {/* Flexible Dates Toggle */}
+          <div className="flex items-center">
+            <label className="flex items-center gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={flexibleDates}
+                onChange={(e) => setFlexibleDates(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+                aria-describedby="flexible-dates-help"
+              />
+              <span className="text-sm text-gray-600">
+                Flexible dates (±3 days)
+              </span>
+            </label>
+            <div className="ml-2 group relative">
+              <button
+                type="button"
+                className="w-4 h-4 rounded-full border border-gray-400 text-gray-400 text-xs flex items-center justify-center cursor-help focus:outline-none focus:ring-2 focus:ring-primary-500"
+                aria-label="Help about flexible dates"
+                title="Search flights 3 days before and after your selected dates for more options"
+              >
+                ?
+              </button>
+              <div id="flexible-dates-help" className="absolute hidden group-hover:block group-focus-within:block bottom-full left-0 mb-2 w-64 p-2 bg-gray-800 text-white text-xs rounded shadow-lg z-10" role="tooltip">
+                Search flights 3 days before and after your selected dates for more options
+              </div>
+            </div>
+          </div>
+
           {/* Passengers */}
           <div className="relative">
             <label className="block text-sm font-medium text-gray-700 mb-2">

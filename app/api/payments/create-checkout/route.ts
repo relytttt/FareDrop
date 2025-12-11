@@ -11,11 +11,32 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { offerId, passengerCount, route, totalAmount, currency = 'AUD', metadata = {} } = body;
+    const { 
+      offerId, 
+      passengerCount, 
+      route, 
+      totalAmount, 
+      currency = 'AUD', 
+      passengers,
+      userId,
+      origin,
+      destination,
+      departureDate,
+      returnDate,
+      metadata = {} 
+    } = body;
 
     if (!offerId || !passengerCount || !route || !totalAmount) {
       return NextResponse.json(
         { error: 'Missing required fields' },
+        { status: 400 }
+      );
+    }
+
+    // Validate passenger data
+    if (!passengers || !Array.isArray(passengers) || passengers.length === 0) {
+      return NextResponse.json(
+        { error: 'Passenger data is required' },
         { status: 400 }
       );
     }
@@ -41,10 +62,17 @@ export async function POST(request: NextRequest) {
       mode: 'payment',
       success_url: `${siteUrl}/booking/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/flights`,
+      customer_email: passengers[0]?.email || undefined,
       metadata: {
         offer_id: offerId,
         passenger_count: passengerCount.toString(),
         route,
+        passengers_json: JSON.stringify(passengers),
+        user_id: userId || '',
+        origin: origin || route.split(' → ')[0] || '',
+        destination: destination || route.split(' → ')[1] || '',
+        departure_date: departureDate || '',
+        return_date: returnDate || '',
         ...metadata,
       },
     });
