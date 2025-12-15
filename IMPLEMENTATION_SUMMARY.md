@@ -106,7 +106,7 @@ Configurable in `lib/duffel.ts`:
 
 ### Environment Variables
 ```env
-DUFFEL_API_TOKEN=duffel_live_7THF4HBa7cj0OLaTBHhePzDw2-bMVlvZxlo_xO8ID69
+DUFFEL_API_TOKEN=your_duffel_api_token_here
 ```
 
 ### API Integration
@@ -204,7 +204,7 @@ The implementation is complete and ready for testing:
 
 1. **Set Environment Variable**:
    ```bash
-   DUFFEL_API_TOKEN=duffel_live_7THF4HBa7cj0OLaTBHhePzDw2-bMVlvZxlo_xO8ID69
+   DUFFEL_API_TOKEN=your_duffel_api_token_here
    ```
 
 2. **Run Development Server**:
