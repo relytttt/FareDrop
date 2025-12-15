@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getServiceSupabase } from '@/lib/supabase';
 import { createOrder } from '@/lib/duffel';
+import { TRIP_EXTRAS } from '@/lib/tripExtras';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -53,7 +54,21 @@ export async function POST(request: NextRequest) {
         try {
           // Parse passengers from metadata
           const passengers = passengers_json ? JSON.parse(passengers_json) : [];
-          const tripExtras = trip_extras_json ? JSON.parse(trip_extras_json) : [];
+          
+          // Parse minimal trip extras and reconstruct full extras data
+          let tripExtras = [];
+          if (trip_extras_json) {
+            const minimalExtras = JSON.parse(trip_extras_json);
+            // Reconstruct full extras from minimal data using TRIP_EXTRAS lookup
+            tripExtras = minimalExtras.map((item: any) => {
+              const extraData = TRIP_EXTRAS.find(e => e.id === item.id);
+              return {
+                extra: extraData,
+                quantity: item.qty,
+                calculatedPrice: item.price
+              };
+            });
+          }
           
           if (passengers.length === 0) {
             throw new Error('No passenger data found in session metadata');
