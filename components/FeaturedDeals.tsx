@@ -107,14 +107,12 @@ export default function FeaturedDeals({ deals }: FeaturedDealsProps) {
 
                 {/* Actions */}
                 <div className="flex gap-3">
-                  <a
-                    href={deal.affiliate_link}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <Link
+                    href={`/flights?origin=${encodeURIComponent(deal.origin)}&destination=${encodeURIComponent(deal.destination)}&departureDate=${encodeURIComponent(deal.departure_date)}&returnDate=${encodeURIComponent(deal.return_date || '')}&adults=1&children=0&infants=0&cabinClass=economy`}
                     className="flex-1 bg-gradient-to-r from-primary-500 to-accent-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 text-center"
                   >
                     Book Now
-                  </a>
+                  </Link>
                   <Link
                     href={`/deals/${deal.id}`}
                     className="px-6 py-3 border-2 border-primary-500 text-primary-600 rounded-lg font-semibold hover:bg-primary-50 transition-colors duration-200 text-center"

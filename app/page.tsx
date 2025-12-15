@@ -1,36 +1,26 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Sparkles, TrendingDown, Globe, LayoutGrid, List } from 'lucide-react';
+import { Sparkles, TrendingDown, Globe } from 'lucide-react';
 import DealGrid from '@/components/DealGrid';
-import SearchFilters from '@/components/SearchFilters';
 import EmailCapture from '@/components/EmailCapture';
 import AlertModal from '@/components/AlertModal';
-import FeaturedDeals from '@/components/FeaturedDeals';
-import TripUpsells from '@/components/TripUpsells';
 import FlightSearch from '@/components/FlightSearch';
-import { Deal, SearchFilters as SearchFiltersType, ViewMode } from '@/types';
+import { Deal } from '@/types';
 import Link from 'next/link';
 
 export default function Home() {
   const [deals, setDeals] = useState<Deal[]>([]);
-  const [filteredDeals, setFilteredDeals] = useState<Deal[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAlertModal, setShowAlertModal] = useState(false);
-  const [filters, setFilters] = useState<SearchFiltersType>({});
-  const [viewMode, setViewMode] = useState<ViewMode>('list');
 
   useEffect(() => {
     fetchDeals();
   }, []);
 
-  useEffect(() => {
-    applyFilters();
-  }, [deals, filters]);
-
   const fetchDeals = async () => {
     try {
-      const response = await fetch('/api/deals');
+      const response = await fetch('/api/flights/deals');
       if (response.ok) {
         const data = await response.json();
         setDeals(data.deals || []);
@@ -40,60 +30,6 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const applyFilters = () => {
-    let filtered = [...deals];
-
-    // Filter by departure city
-    if (filters.departureCity && filters.departureCity !== 'All Cities') {
-      filtered = filtered.filter((deal) =>
-        deal.origin_city?.includes(filters.departureCity!.split('(')[0].trim())
-      );
-    }
-
-    // Filter by destination region
-    if (filters.destinationRegion && filters.destinationRegion !== 'All Regions') {
-      filtered = filtered.filter((deal) => deal.destination_region === filters.destinationRegion);
-    }
-
-    // Filter by destination city
-    if (filters.destinationCity) {
-      filtered = filtered.filter((deal) => deal.destination_city === filters.destinationCity);
-    }
-
-    // Filter by max price
-    if (filters.maxPrice) {
-      filtered = filtered.filter((deal) => deal.price <= filters.maxPrice!);
-    }
-
-    // Filter by min discount
-    if (filters.minDiscount && filters.minDiscount > 0) {
-      filtered = filtered.filter((deal) => {
-        if (!deal.original_price) return false;
-        const discount = ((deal.original_price - deal.price) / deal.original_price) * 100;
-        return discount >= filters.minDiscount!;
-      });
-    }
-
-    // Sort
-    switch (filters.sortBy) {
-      case 'price':
-        filtered.sort((a, b) => a.price - b.price);
-        break;
-      case 'date':
-        filtered.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-        break;
-      case 'discount':
-      default:
-        filtered.sort((a, b) => {
-          const discountA = a.original_price ? ((a.original_price - a.price) / a.original_price) * 100 : 0;
-          const discountB = b.original_price ? ((b.original_price - b.price) / b.original_price) * 100 : 0;
-          return discountB - discountA;
-        });
-    }
-
-    setFilteredDeals(filtered);
   };
 
   return (
@@ -166,34 +102,6 @@ export default function Home() {
             </p>
           </div>
 
-          <SearchFilters onFilterChange={setFilters} initialFilters={filters} deals={deals} />
-
-          {/* View Toggle Buttons */}
-          <div className="flex gap-2 mb-6">
-            <button 
-              onClick={() => setViewMode('list')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                viewMode === 'list' 
-                  ? 'bg-primary-500 text-white' 
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <List size={18} />
-              List View
-            </button>
-            <button 
-              onClick={() => setViewMode('tile')}
-              className={`flex items-center gap-2 px-4 py-2 rounded-lg font-medium transition-colors ${
-                viewMode === 'tile' 
-                  ? 'bg-primary-500 text-white' 
-                  : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50'
-              }`}
-            >
-              <LayoutGrid size={18} />
-              Tile View
-            </button>
-          </div>
-
           {loading ? (
             <div className="text-center py-16">
               <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-primary-500"></div>
@@ -201,30 +109,19 @@ export default function Home() {
             </div>
           ) : (
             <>
-              {/* Featured Top 3 Deals */}
-              <FeaturedDeals deals={filteredDeals} />
+              {/* Top 6 Deals in Tile View */}
+              <DealGrid deals={deals.slice(0, 6)} viewMode="tile" />
               
-              {/* All Deals with selected view mode */}
-              <DealGrid deals={filteredDeals.slice(0, 6)} viewMode={viewMode} />
-              
-              {filteredDeals.length > 6 && (
+              {deals.length > 6 && (
                 <div className="text-center mt-12">
                   <Link
                     href="/deals"
                     className="inline-block bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-3 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl"
                   >
-                    View All {filteredDeals.length} Deals →
+                    View All Deals →
                   </Link>
                 </div>
               )}
-
-              {/* Trip Upsells Section */}
-              <div className="mt-12">
-                <TripUpsells 
-                  destination={filters.destinationCity && filteredDeals.length > 0 ? filteredDeals[0]?.destination : undefined}
-                  destinationCity={filters.destinationCity || (filteredDeals.length > 0 ? filteredDeals[0]?.destination_city : undefined)}
-                />
-              </div>
             </>
           )}
         </div>
