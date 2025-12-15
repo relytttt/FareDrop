@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation';
-import { Plane, Calendar, MapPin, TrendingDown, ExternalLink } from 'lucide-react';
+import { Plane, Calendar, TrendingDown } from 'lucide-react';
 import PriceDisplay from '@/components/PriceDisplay';
 import TripUpsells from '@/components/TripUpsells';
 import Link from 'next/link';
@@ -34,6 +34,9 @@ export default async function DealDetailsPage({ params }: { params: { id: string
   const tripDuration = returnDate
     ? Math.ceil((returnDate.getTime() - departureDate.getTime()) / (1000 * 60 * 60 * 24))
     : null;
+
+  // Build internal booking URL
+  const bookingUrl = `/flights?origin=${encodeURIComponent(deal.origin)}&destination=${encodeURIComponent(deal.destination)}&departureDate=${encodeURIComponent(deal.departure_date)}&returnDate=${encodeURIComponent(deal.return_date || '')}&adults=1&children=0&infants=0&cabinClass=economy`;
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -161,18 +164,15 @@ export default async function DealDetailsPage({ params }: { params: { id: string
             )}
 
             {/* CTA Button */}
-            <a
-              href={deal.affiliate_link}
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href={bookingUrl}
               className="w-full bg-gradient-to-r from-primary-500 to-accent-500 text-white px-8 py-4 rounded-lg font-semibold hover:from-primary-600 hover:to-accent-600 transition-all duration-200 shadow-lg hover:shadow-xl flex items-center justify-center gap-2 text-lg"
             >
               Book This Deal
-              <ExternalLink size={20} />
-            </a>
+            </Link>
 
             <p className="text-center text-sm text-gray-500 mt-4">
-              You'll be redirected to our partner's site to complete your booking
+              Search and book directly through FareDrop
             </p>
           </div>
         </div>
