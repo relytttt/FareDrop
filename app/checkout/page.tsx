@@ -43,7 +43,7 @@ export default function CheckoutPage() {
 
   const basePrice = parseFloat(bookingData.offer.display_price || bookingData.offer.total_amount);
   const totalPassengers = bookingData.passengers.length;
-  const totalAmount = calculateTotalPrice(basePrice) + (bookingData.addOnsTotal || 0);
+  const totalAmount = calculateTotalPrice(basePrice) + (bookingData.addOnsTotal || 0) + (bookingData.tripExtrasTotal || 0);
   const route = `${bookingData.offer.slices[0].origin.iata_code} → ${bookingData.offer.slices[0].destination.iata_code}`;
 
   return (
@@ -71,6 +71,7 @@ export default function CheckoutPage() {
               passengerCount={totalPassengers}
               route={route}
               passengers={bookingData.passengers}
+              tripExtras={bookingData.selectedTripExtras || []}
             />
 
             {/* Booking Summary */}
@@ -113,6 +114,8 @@ export default function CheckoutPage() {
               basePrice={basePrice}
               currency={bookingData.offer.total_currency}
               addOnsTotal={bookingData.addOnsTotal || 0}
+              tripExtrasTotal={bookingData.tripExtrasTotal || 0}
+              tripExtras={bookingData.selectedTripExtras || []}
               passengerCount={totalPassengers}
             />
 

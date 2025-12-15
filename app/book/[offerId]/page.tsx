@@ -7,9 +7,11 @@ import { PassengerDetails } from '@/lib/duffel';
 import PassengerForm from '@/components/PassengerForm';
 import PriceBreakdown from '@/components/PriceBreakdown';
 import AddOns from '@/components/AddOns';
-import { format } from 'date-fns';
+import TripExtrasSelector from '@/components/TripExtrasSelector';
+import { format, differenceInDays } from 'date-fns';
 import { Plane, Calendar, Clock } from 'lucide-react';
 import { getDepartureTime, getArrivalTime } from '@/lib/utils/flightUtils';
+import { SelectedExtra } from '@/lib/tripExtras';
 
 export default function BookingPage() {
   const params = useParams();
@@ -22,6 +24,8 @@ export default function BookingPage() {
   const [passengers, setPassengers] = useState<PassengerDetails[]>([]);
   const [selectedAddOns, setSelectedAddOns] = useState<string[]>([]);
   const [addOnsTotal, setAddOnsTotal] = useState(0);
+  const [selectedTripExtras, setSelectedTripExtras] = useState<SelectedExtra[]>([]);
+  const [tripExtrasTotal, setTripExtrasTotal] = useState(0);
   const [submitting, setSubmitting] = useState(false);
 
   // Get search params from URL
@@ -68,6 +72,11 @@ export default function BookingPage() {
     setAddOnsTotal(total);
   };
 
+  const handleTripExtrasChange = (selectedExtras: SelectedExtra[], total: number) => {
+    setSelectedTripExtras(selectedExtras);
+    setTripExtrasTotal(total);
+  };
+
   const validateForm = () => {
     // Check all passengers have required fields
     for (const passenger of passengers) {
@@ -100,6 +109,8 @@ export default function BookingPage() {
         passengers,
         selectedAddOns,
         addOnsTotal,
+        selectedTripExtras,
+        tripExtrasTotal,
       };
       localStorage.setItem('pendingBooking', JSON.stringify(bookingData));
 
@@ -143,6 +154,15 @@ export default function BookingPage() {
 
   const basePrice = parseFloat(offer.display_price || offer.total_amount);
   const totalPassengers = passengerCount.adults + passengerCount.children + passengerCount.infants;
+  
+  // Calculate trip duration for trip extras pricing
+  const departureDate = getDepartureTime(offer.slices[0]);
+  const returnDate = offer.slices.length > 1 ? getDepartureTime(offer.slices[1]) : null;
+  const tripDuration = departureDate && returnDate 
+    ? Math.max(1, differenceInDays(new Date(returnDate), new Date(departureDate)))
+    : 7; // Default to 7 days if dates not available
+  
+  const destinationCity = offer.slices[0].destination.city_name || offer.slices[0].destination.iata_code;
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -236,6 +256,15 @@ export default function BookingPage() {
                 onAddOnsChange={handleAddOnsChange}
               />
             </div>
+
+            {/* Trip Extras */}
+            <div>
+              <TripExtrasSelector
+                tripDuration={tripDuration}
+                destination={destinationCity}
+                onExtrasChange={handleTripExtrasChange}
+              />
+            </div>
           </div>
 
           {/* Right Column - Price Summary */}
@@ -245,6 +274,8 @@ export default function BookingPage() {
                 basePrice={basePrice}
                 currency={offer.total_currency}
                 addOnsTotal={addOnsTotal}
+                tripExtrasTotal={tripExtrasTotal}
+                tripExtras={selectedTripExtras}
                 passengerCount={totalPassengers}
               />
 

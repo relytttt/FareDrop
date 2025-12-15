@@ -23,6 +23,7 @@ export async function POST(request: NextRequest) {
       destination,
       departureDate,
       returnDate,
+      tripExtras = [],
       metadata = {} 
     } = body;
 
@@ -43,22 +44,28 @@ export async function POST(request: NextRequest) {
 
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
+    // Build line items array - start with flight
+    const lineItems: any[] = [
+      {
+        price_data: {
+          currency: currency.toLowerCase(),
+          product_data: {
+            name: `Flight Booking: ${route}`,
+            description: `${passengerCount} passenger${passengerCount > 1 ? 's' : ''}`,
+          },
+          unit_amount: Math.round(totalAmount * 100), // Convert to cents (includes everything)
+        },
+        quantity: 1,
+      },
+    ];
+
+    // Add trip extras as separate line items for transparency (already included in totalAmount)
+    // Note: These are for display purposes in Stripe checkout, the main amount is in the flight line item
+    
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
-      line_items: [
-        {
-          price_data: {
-            currency: currency.toLowerCase(),
-            product_data: {
-              name: `Flight Booking: ${route}`,
-              description: `${passengerCount} passenger${passengerCount > 1 ? 's' : ''}`,
-            },
-            unit_amount: Math.round(totalAmount * 100), // Convert to cents
-          },
-          quantity: 1,
-        },
-      ],
+      line_items: lineItems,
       mode: 'payment',
       success_url: `${siteUrl}/booking/confirmation?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${siteUrl}/flights`,
@@ -68,6 +75,7 @@ export async function POST(request: NextRequest) {
         passenger_count: passengerCount.toString(),
         route,
         passengers_json: JSON.stringify(passengers),
+        trip_extras_json: tripExtras.length > 0 ? JSON.stringify(tripExtras) : '',
         user_id: userId || '',
         origin: origin || route.split(' → ')[0] || '',
         destination: destination || route.split(' → ')[1] || '',
