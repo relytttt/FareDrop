@@ -83,6 +83,9 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
                 <div className="text-2xl font-bold text-gray-900">
                   {safeFormatDate(getDepartureTime(slice), 'HH:mm')}
                 </div>
+                <div className="text-xs text-gray-500">
+                  {safeFormatDate(getDepartureTime(slice), 'MMM d, yyyy')}
+                </div>
                 <div className="text-sm text-gray-600">{slice.origin.iata_code}</div>
               </div>
 
@@ -104,6 +107,9 @@ export default function FlightCard({ offer, searchParams }: FlightCardProps) {
               <div className="text-center">
                 <div className="text-2xl font-bold text-gray-900">
                   {safeFormatDate(getArrivalTime(slice), 'HH:mm')}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {safeFormatDate(getArrivalTime(slice), 'MMM d, yyyy')}
                 </div>
                 <div className="text-sm text-gray-600">{slice.destination.iata_code}</div>
               </div>

@@ -168,7 +168,7 @@ export default function AccountPage() {
         </div>
 
         <div className="border border-gray-200 rounded-lg p-6">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h3 className="text-lg font-semibold text-gray-800">
                 {user?.subscription_tier === 'premium' ? '⭐ Premium Plan' : 'Free Plan'}
@@ -180,11 +180,101 @@ export default function AccountPage() {
               </p>
             </div>
             {user?.subscription_tier === 'free' && (
-              <button className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200">
+              <a 
+                href="/pricing"
+                className="bg-gradient-to-r from-yellow-400 to-orange-500 text-white px-6 py-3 rounded-lg font-semibold hover:from-yellow-500 hover:to-orange-600 transition-all duration-200"
+              >
                 Upgrade to Premium
-              </button>
+              </a>
             )}
           </div>
+
+          {user?.subscription_tier === 'premium' && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <button className="text-gray-600 hover:text-primary-600 text-sm font-medium">
+                Manage Subscription →
+              </button>
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Email Preferences */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <Mail className="text-primary-600" size={28} />
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Email Preferences</h2>
+            <p className="text-gray-600">Control what emails you receive</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <label className="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+            <div>
+              <div className="font-semibold text-gray-800">Deal Alerts</div>
+              <div className="text-sm text-gray-600">Receive notifications about flight deals matching your preferences</div>
+            </div>
+            <input
+              type="checkbox"
+              defaultChecked
+              className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+            />
+          </label>
+
+          <label className="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+            <div>
+              <div className="font-semibold text-gray-800">Newsletter</div>
+              <div className="text-sm text-gray-600">Weekly roundup of the best flight deals and travel tips</div>
+            </div>
+            <input
+              type="checkbox"
+              defaultChecked
+              className="w-5 h-5 text-primary-600 border-gray-300 rounded focus:ring-primary-500"
+            />
+          </label>
+
+          <label className="flex items-center justify-between p-4 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50 transition-colors">
+            <div>
+              <div className="font-semibold text-gray-800">Booking Updates</div>
+              <div className="text-sm text-gray-600">Important updates about your bookings and travel</div>
+            </div>
+            <input
+              type="checkbox"
+              defaultChecked
+              disabled
+              className="w-5 h-5 text-gray-400 border-gray-300 rounded cursor-not-allowed"
+            />
+          </label>
+
+          <div className="pt-4 border-t border-gray-200">
+            <button className="text-red-600 hover:text-red-700 text-sm font-medium">
+              Unsubscribe from all marketing emails
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Account Actions */}
+      <div className="bg-white rounded-lg shadow-md p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <UserIcon className="text-primary-600" size={28} />
+          <div>
+            <h2 className="text-2xl font-bold text-gray-800">Account Actions</h2>
+            <p className="text-gray-600">Manage your account settings</p>
+          </div>
+        </div>
+
+        <div className="space-y-4">
+          <button className="w-full p-4 text-left border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+            <div className="font-semibold text-gray-800">Change Password</div>
+            <div className="text-sm text-gray-600 mt-1">Update your account password</div>
+          </button>
+
+          <button className="w-full p-4 text-left border border-red-200 rounded-lg hover:bg-red-50 transition-colors">
+            <div className="font-semibold text-red-600">Delete Account</div>
+            <div className="text-sm text-red-600 mt-1">Permanently delete your account and all associated data</div>
+          </button>
         </div>
       </div>
     </div>

@@ -21,15 +21,21 @@ export default function TermsPage() {
             </section>
 
             <section className="mb-8">
-              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Use of Service</h2>
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Service Description</h2>
               <p className="text-gray-700 mb-4">
-                FareDrop provides a platform to discover and compare flight deals. Our service includes:
+                FareDrop is a full-service flight booking platform powered by Duffel API. Our service includes:
               </p>
               <ul className="list-disc pl-6 text-gray-700 space-y-2">
-                <li>Aggregating flight deals from various sources</li>
-                <li>Providing deal alerts based on user preferences</li>
-                <li>Facilitating flight searches and bookings through partner providers</li>
+                <li><strong>Flight Search:</strong> Search and compare real-time flight prices from multiple airlines</li>
+                <li><strong>Direct Booking:</strong> Book and pay for flights directly through our platform</li>
+                <li><strong>Deal Alerts:</strong> Receive notifications for flight deals based on your preferences</li>
+                <li><strong>Payment Processing:</strong> Secure payment processing via Stripe</li>
+                <li><strong>Booking Management:</strong> Access your booking confirmations and travel documents</li>
               </ul>
+              <p className="text-gray-700 mt-4">
+                When you book a flight through FareDrop, you are entering into a contract with the airline. 
+                FareDrop acts as an agent to facilitate the booking on your behalf.
+              </p>
             </section>
 
             <section className="mb-8">
@@ -46,11 +52,51 @@ export default function TermsPage() {
             </section>
 
             <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Booking Terms</h2>
+              <p className="text-gray-700 mb-4">
+                When you book a flight through FareDrop:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2">
+                <li><strong>Accuracy:</strong> You are responsible for ensuring all passenger information is accurate and matches travel documents</li>
+                <li><strong>Payment:</strong> Payment must be completed at the time of booking. All prices are in the currency displayed</li>
+                <li><strong>Confirmation:</strong> You will receive a booking confirmation via email. Check all details immediately</li>
+                <li><strong>Changes:</strong> Changes to bookings are subject to airline policies and may incur fees</li>
+                <li><strong>Cancellations:</strong> Cancellations are subject to our Refund Policy and airline fare rules</li>
+                <li><strong>No-Shows:</strong> Failure to check in or board your flight results in forfeiture of your ticket with no refund</li>
+                <li><strong>Travel Documents:</strong> You are responsible for obtaining necessary visas, passports, and travel authorizations</li>
+              </ul>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Pricing and Payment</h2>
+              <p className="text-gray-700 mb-4">
+                All prices displayed include:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2">
+                <li>Base airfare</li>
+                <li>Mandatory taxes and fees</li>
+                <li>Airline surcharges</li>
+              </ul>
+              <p className="text-gray-700 mt-4">
+                Prices may change without notice until payment is completed. We are not responsible for price 
+                increases between search and booking. Additional fees may apply for optional services (baggage, 
+                seat selection, etc.).
+              </p>
+            </section>
+
+            <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Third-Party Services</h2>
               <p className="text-gray-700 mb-4">
-                FareDrop may contain links to third-party websites or services (airlines, booking platforms, etc.) 
-                that are not owned or controlled by FareDrop. We have no control over, and assume no responsibility 
-                for, the content, privacy policies, or practices of any third-party websites or services.
+                FareDrop partners with third-party service providers:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2">
+                <li><strong>Airlines:</strong> Flight services are provided by the carrier. Airline terms and conditions apply</li>
+                <li><strong>Duffel:</strong> Flight booking API provider. Their terms govern the booking process</li>
+                <li><strong>Stripe:</strong> Payment processing. Stripe's terms govern payment transactions</li>
+              </ul>
+              <p className="text-gray-700 mt-4">
+                We have no control over, and assume no responsibility for, the content, privacy policies, or 
+                practices of third-party service providers beyond facilitating the transaction.
               </p>
             </section>
 
@@ -70,8 +116,35 @@ export default function TermsPage() {
             <section className="mb-8">
               <h2 className="text-2xl font-semibold text-gray-900 mb-4">Limitation of Liability</h2>
               <p className="text-gray-700 mb-4">
-                FareDrop shall not be liable for any indirect, incidental, special, consequential, or punitive 
-                damages resulting from your use of or inability to use the service.
+                To the maximum extent permitted by law, FareDrop shall not be liable for:
+              </p>
+              <ul className="list-disc pl-6 text-gray-700 space-y-2">
+                <li>Flight delays, cancellations, or schedule changes made by airlines</li>
+                <li>Lost, delayed, or damaged baggage</li>
+                <li>Denied boarding or travel due to visa, passport, or documentation issues</li>
+                <li>Acts of nature, war, terrorism, or other force majeure events</li>
+                <li>Airline service quality or in-flight experience</li>
+                <li>Third-party service failures beyond our control</li>
+                <li>Any indirect, incidental, special, consequential, or punitive damages</li>
+              </ul>
+              <p className="text-gray-700 mt-4">
+                Our maximum liability to you for any claim is limited to the amount you paid for the booking, 
+                excluding airline-imposed fees and taxes.
+              </p>
+            </section>
+
+            <section className="mb-8">
+              <h2 className="text-2xl font-semibold text-gray-900 mb-4">Dispute Resolution</h2>
+              <p className="text-gray-700 mb-4">
+                In the event of a dispute:
+              </p>
+              <ol className="list-decimal pl-6 text-gray-700 space-y-2">
+                <li>Contact our support team at <a href="mailto:support@faredrop.com" className="text-primary-600 hover:underline">support@faredrop.com</a> to resolve the issue informally</li>
+                <li>If informal resolution fails, disputes will be resolved through binding arbitration</li>
+                <li>You agree to waive your right to a jury trial or to participate in a class action lawsuit</li>
+              </ol>
+              <p className="text-gray-700 mt-4">
+                These terms are governed by the laws of the jurisdiction in which FareDrop operates.
               </p>
             </section>
 

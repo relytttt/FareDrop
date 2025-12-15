@@ -27,10 +27,13 @@ export default function AboutPage() {
 
           <div className="prose prose-lg max-w-none text-gray-700">
             <p>
-              At FareDrop, we believe that everyone deserves to explore the world. Travel shouldn't be a luxury reserved for the few—it should be accessible to all. That's why we've built a powerful platform that scans thousands of flights every day to find the absolute best deals.
+              At FareDrop, we believe that everyone deserves to explore the world. Travel shouldn't be a luxury reserved for the few—it should be accessible to all. That's why we've built a powerful flight booking platform that allows you to search, book, and pay for flights directly through our service.
             </p>
             <p>
-              Our advanced algorithms analyze pricing patterns, identify mistake fares, and spot limited-time promotions before they disappear. We then deliver these incredible deals directly to you, saving you hours of research and potentially thousands of dollars.
+              Powered by Duffel API, we connect you to real airline inventory and live pricing. When you book through FareDrop, you're making a real reservation with the airline—not just finding a deal that disappears when you click through. Our platform handles the entire booking process from search to payment to confirmation.
+            </p>
+            <p>
+              Beyond direct booking, our advanced algorithms analyze pricing patterns, identify exceptional deals, and spot limited-time promotions. We then deliver these incredible deals directly to you, saving you hours of research and potentially thousands of dollars.
             </p>
           </div>
         </div>
@@ -48,9 +51,9 @@ export default function AboutPage() {
               <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
                 <Target className="text-primary-600" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Smart Algorithms</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Direct Booking Platform</h3>
               <p className="text-gray-600">
-                Our technology monitors pricing across airlines, consolidators, and OTAs 24/7, identifying patterns and anomalies.
+                Search, compare, and book flights directly through FareDrop. Powered by Duffel API for real airline bookings with instant confirmation.
               </p>
             </div>
 
@@ -58,9 +61,9 @@ export default function AboutPage() {
               <div className="bg-accent-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
                 <Users className="text-accent-600" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Human Curation</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Secure Payment</h3>
               <p className="text-gray-600">
-                Our team of travel experts reviews and verifies deals to ensure quality and real value for our users.
+                Complete your booking with confidence using Stripe's secure payment processing. No redirects to third-party sites—everything happens on FareDrop.
               </p>
             </div>
 
@@ -68,9 +71,9 @@ export default function AboutPage() {
               <div className="bg-primary-100 w-16 h-16 rounded-full flex items-center justify-center mb-4">
                 <Mail className="text-primary-600" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-gray-900 mb-3">Instant Alerts</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-3">Deal Discovery</h3>
               <p className="text-gray-600">
-                When we find an exceptional deal matching your preferences, you're notified immediately via email.
+                Browse curated deals or set up price alerts. We monitor flights 24/7 and notify you immediately when exceptional deals matching your preferences appear.
               </p>
             </div>
           </div>
@@ -112,7 +115,7 @@ export default function AboutPage() {
             <div className="bg-white rounded-lg p-6 shadow-md">
               <h3 className="text-xl font-bold text-gray-900 mb-2">Transparency</h3>
               <p className="text-gray-600">
-                We show you exactly what you're getting—no hidden fees, no bait-and-switch tactics. Every deal links directly to the booking site.
+                We show you exactly what you're getting—no hidden fees, no bait-and-switch tactics. All prices include taxes and mandatory fees. Book with confidence knowing the price you see is the price you pay.
               </p>
             </div>
 
@@ -124,9 +127,9 @@ export default function AboutPage() {
             </div>
 
             <div className="bg-white rounded-lg p-6 shadow-md">
-              <h3 className="text-xl font-bold text-gray-900 mb-2">User Privacy</h3>
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Security & Trust</h3>
               <p className="text-gray-600">
-                Your data is yours. We never sell your information to third parties and only use your email to send you the deals you want.
+                Your data and payments are protected with industry-standard encryption. We partner with trusted providers (Duffel for bookings, Stripe for payments) to ensure your information is secure. See our <Link href="/privacy" className="text-primary-600 hover:underline">Privacy Policy</Link> and <Link href="/terms" className="text-primary-600 hover:underline">Terms of Service</Link> for details.
               </p>
             </div>
           </div>
