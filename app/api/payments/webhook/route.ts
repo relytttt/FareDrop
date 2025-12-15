@@ -40,7 +40,7 @@ export async function POST(request: NextRequest) {
         const session = event.data.object as Stripe.Checkout.Session;
         
         // Extract metadata
-        const { offer_id, passengers_json, user_id, departure_date, return_date } = session.metadata || {};
+        const { offer_id, passengers_json, trip_extras_json, user_id, departure_date, return_date } = session.metadata || {};
         
         if (!offer_id) {
           console.error('No offer_id in session metadata');
@@ -53,6 +53,7 @@ export async function POST(request: NextRequest) {
         try {
           // Parse passengers from metadata
           const passengers = passengers_json ? JSON.parse(passengers_json) : [];
+          const tripExtras = trip_extras_json ? JSON.parse(trip_extras_json) : [];
           
           if (passengers.length === 0) {
             throw new Error('No passenger data found in session metadata');
@@ -78,6 +79,7 @@ export async function POST(request: NextRequest) {
             departure_date: duffelOrder.slices[0]?.segments[0]?.departing_at?.split('T')[0] || departure_date,
             return_date: duffelOrder.slices[1]?.segments[0]?.departing_at?.split('T')[0] || return_date || null,
             passenger_count: passengers.length,
+            trip_extras: tripExtras.length > 0 ? tripExtras : null,
           };
 
           const { data: booking, error: bookingError } = await supabase

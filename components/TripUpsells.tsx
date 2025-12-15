@@ -1,4 +1,5 @@
 import { Hotel, Car, Shield, Smartphone } from 'lucide-react';
+import Link from 'next/link';
 
 interface TripUpsellsProps {
   destination?: string; // Airport code like "DPS"
@@ -6,6 +7,7 @@ interface TripUpsellsProps {
   departureDate?: string;
   returnDate?: string;
   showTitle?: boolean;
+  bookingMode?: boolean; // If true, show as informational (extras are in booking flow)
 }
 
 export default function TripUpsells({
@@ -14,10 +16,36 @@ export default function TripUpsells({
   departureDate,
   returnDate,
   showTitle = true,
+  bookingMode = false,
 }: TripUpsellsProps) {
   const destinationName = destinationCity || destination || 'your destination';
   
-  // Build affiliate URLs with proper encoding
+  // If in booking mode, show informational message
+  if (bookingMode) {
+    return (
+      <div className="bg-gradient-to-br from-primary-50 to-accent-50 rounded-lg shadow-md overflow-hidden border border-primary-200">
+        <div className="p-6">
+          <h3 className="text-xl font-bold text-gray-900 mb-2">✨ Enhance Your Trip</h3>
+          <p className="text-gray-700 mb-4">
+            Add travel insurance, eSIM data, and car rental directly to your booking below. 
+            Everything you need for your trip to {destinationName} in one place!
+          </p>
+          <div className="flex items-center gap-2 text-sm text-gray-600">
+            <Shield className="w-4 h-4" />
+            <span>Travel Insurance</span>
+            <span className="text-gray-400">•</span>
+            <Smartphone className="w-4 h-4" />
+            <span>eSIM Data</span>
+            <span className="text-gray-400">•</span>
+            <Car className="w-4 h-4" />
+            <span>Car Rental</span>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Build affiliate URLs with proper encoding (for non-booking pages)
   const hotelsUrl = destination
     ? `https://search.hotellook.com/?marker=689762&destination=${encodeURIComponent(destination)}${departureDate ? `&checkIn=${encodeURIComponent(departureDate)}` : ''}${returnDate ? `&checkOut=${encodeURIComponent(returnDate)}` : ''}`
     : 'https://search.hotellook.com/?marker=689762';
