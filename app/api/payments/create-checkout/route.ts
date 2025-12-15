@@ -1,5 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { SelectedExtra } from '@/lib/tripExtras';
+
+interface MinimalExtra {
+  id: string;
+  qty: number;
+  price: number;
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -63,8 +70,8 @@ export async function POST(request: NextRequest) {
     
     // Create minimal trip extras data to stay under Stripe's 500 character metadata limit
     // Only store essential data (id, quantity, price) - full details can be looked up later
-    const minimalExtras = tripExtras.length > 0 
-      ? tripExtras.map((item: any) => ({
+    const minimalExtras: MinimalExtra[] = tripExtras.length > 0 
+      ? tripExtras.map((item: SelectedExtra) => ({
           id: item.extra.id,
           qty: item.quantity || 1,
           price: item.calculatedPrice

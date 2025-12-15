@@ -2,8 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getServiceSupabase } from '@/lib/supabase';
 import { createOrder } from '@/lib/duffel';
-import { TRIP_EXTRAS } from '@/lib/tripExtras';
+import { TRIP_EXTRAS, SelectedExtra } from '@/lib/tripExtras';
 import Stripe from 'stripe';
+
+interface MinimalExtra {
+  id: string;
+  qty: number;
+  price: number;
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
@@ -56,18 +62,26 @@ export async function POST(request: NextRequest) {
           const passengers = passengers_json ? JSON.parse(passengers_json) : [];
           
           // Parse minimal trip extras and reconstruct full extras data
-          let tripExtras = [];
+          let tripExtras: SelectedExtra[] = [];
           if (trip_extras_json) {
-            const minimalExtras = JSON.parse(trip_extras_json);
+            const minimalExtras: MinimalExtra[] = JSON.parse(trip_extras_json);
             // Reconstruct full extras from minimal data using TRIP_EXTRAS lookup
-            tripExtras = minimalExtras.map((item: any) => {
-              const extraData = TRIP_EXTRAS.find(e => e.id === item.id);
-              return {
-                extra: extraData,
-                quantity: item.qty,
-                calculatedPrice: item.price
-              };
-            });
+            const reconstructed = minimalExtras
+              .map((item: MinimalExtra) => {
+                const extraData = TRIP_EXTRAS.find(e => e.id === item.id);
+                // Skip if extra is not found (e.g., if it was removed from the system)
+                if (!extraData) {
+                  console.warn(`Trip extra with id "${item.id}" not found in TRIP_EXTRAS`);
+                  return null;
+                }
+                return {
+                  extra: extraData,
+                  quantity: item.qty,
+                  calculatedPrice: item.price
+                } as SelectedExtra;
+              })
+              .filter((item): item is SelectedExtra => item !== null);
+            tripExtras = reconstructed;
           }
           
           if (passengers.length === 0) {
