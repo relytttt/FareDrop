@@ -10,6 +10,18 @@ export interface TripExtra {
   popular?: boolean;
 }
 
+export interface SelectedExtra {
+  extra: TripExtra;
+  quantity?: number; // for per_day items
+  calculatedPrice: number;
+}
+
+export interface MinimalExtra {
+  id: string;
+  qty: number;
+  price: number;
+}
+
 export const TRIP_EXTRAS: TripExtra[] = [
   {
     id: 'insurance_basic',
@@ -85,12 +97,6 @@ export const TRIP_EXTRAS: TripExtra[] = [
     popular: true,
   },
 ];
-
-export interface SelectedExtra {
-  extra: TripExtra;
-  quantity?: number; // for per_day items
-  calculatedPrice: number;
-}
 
 // Helper function to calculate price based on trip duration
 export function calculateExtraPrice(extra: TripExtra, tripDuration: number): number {

@@ -1,12 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
-import { SelectedExtra } from '@/lib/tripExtras';
-
-interface MinimalExtra {
-  id: string;
-  qty: number;
-  price: number;
-}
+import { SelectedExtra, MinimalExtra } from '@/lib/tripExtras';
 
 export async function POST(request: NextRequest) {
   try {

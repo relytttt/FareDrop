@@ -2,14 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getServiceSupabase } from '@/lib/supabase';
 import { createOrder } from '@/lib/duffel';
-import { TRIP_EXTRAS, SelectedExtra } from '@/lib/tripExtras';
+import { TRIP_EXTRAS, SelectedExtra, MinimalExtra } from '@/lib/tripExtras';
 import Stripe from 'stripe';
-
-interface MinimalExtra {
-  id: string;
-  qty: number;
-  price: number;
-}
 
 export async function POST(request: NextRequest) {
   const body = await request.text();
