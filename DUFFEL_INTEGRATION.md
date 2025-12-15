@@ -55,7 +55,7 @@ FareDrop now includes a complete flight booking system powered by the Duffel API
 Add to your `.env.local` file:
 
 ```env
-DUFFEL_API_TOKEN=duffel_live_7THF4HBa7cj0OLaTBHhePzDw2-bMVlvZxlo_xO8ID69
+DUFFEL_API_TOKEN=your_duffel_api_token_here
 ```
 
 ## Pricing Strategy
