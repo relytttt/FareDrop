@@ -61,7 +61,7 @@ export async function POST(request: NextRequest) {
             const minimalExtras: MinimalExtra[] = JSON.parse(trip_extras_json);
             // Reconstruct full extras from minimal data using TRIP_EXTRAS lookup
             const reconstructed = minimalExtras
-              .map((item: MinimalExtra) => {
+              .map((item: MinimalExtra): SelectedExtra | null => {
                 const extraData = TRIP_EXTRAS.find(e => e.id === item.id);
                 // Skip if extra is not found (e.g., if it was removed from the system)
                 if (!extraData) {
@@ -72,7 +72,7 @@ export async function POST(request: NextRequest) {
                   extra: extraData,
                   quantity: item.qty,
                   calculatedPrice: item.price
-                } as SelectedExtra;
+                };
               })
               .filter((item): item is SelectedExtra => item !== null);
             tripExtras = reconstructed;
