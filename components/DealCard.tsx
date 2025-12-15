@@ -16,6 +16,9 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   const [isFavorited, setIsFavorited] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [favoriteLoading, setFavoriteLoading] = useState(false);
+  const [adults, setAdults] = useState(1);
+  const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
 
   const supabase = createClientComponentClient();
 
@@ -93,10 +96,25 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
   const tripDuration = calculateTripDuration(deal.departure_date, deal.return_date);
   
   const expiresDate = new Date(deal.expires_at);
-  const daysUntilExpiry = Math.ceil((expiresDate.getTime() - Date.now()) / (1000 * 60 * 60 * 24));
+  const now = new Date();
+  const hoursUntilExpiry = (expiresDate.getTime() - now.getTime()) / (1000 * 60 * 60);
+  const daysUntilExpiry = Math.ceil(hoursUntilExpiry / 24);
+
+  // Determine expiry display text
+  let expiryText = '';
+  let expiryUrgent = false;
+  
+  if (hoursUntilExpiry <= 24) {
+    expiryText = '⚠️ Expires Today!';
+    expiryUrgent = true;
+  } else if (daysUntilExpiry === 1) {
+    expiryText = 'Expires in 1 day';
+  } else if (daysUntilExpiry > 1) {
+    expiryText = `Expires in ${daysUntilExpiry} days`;
+  }
 
   // Build flights page URL with search params
-  const flightsUrl = `/flights?origin=${encodeURIComponent(deal.origin)}&destination=${encodeURIComponent(deal.destination)}&departureDate=${encodeURIComponent(deal.departure_date)}&returnDate=${encodeURIComponent(deal.return_date || '')}&adults=1&children=0&infants=0&cabinClass=economy`;
+  const flightsUrl = `/flights?origin=${encodeURIComponent(deal.origin)}&destination=${encodeURIComponent(deal.destination)}&departureDate=${encodeURIComponent(deal.departure_date)}&returnDate=${encodeURIComponent(deal.return_date || '')}&adults=${adults}&children=${children}&infants=${infants}&cabinClass=economy`;
 
   // Compact list view variant
   if (variant === 'compact') {
@@ -151,6 +169,60 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
                     {deal.trip_type === 'round-trip' ? 'Round-trip' : 'One-way'}
                   </span>
                 )}
+              </div>
+            </div>
+
+            {/* Passenger Selector */}
+            <div className="flex items-center gap-3 flex-shrink-0">
+              <div className="flex gap-3 text-xs">
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-600">Adults:</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); setAdults(Math.max(1, adults - 1)); }}
+                    className="w-5 h-5 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                  <span className="w-4 text-center font-medium">{adults}</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); setAdults(Math.min(9, adults + 1)); }}
+                    className="w-5 h-5 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-600">Children:</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); setChildren(Math.max(0, children - 1)); }}
+                    className="w-5 h-5 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                  <span className="w-4 text-center font-medium">{children}</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); setChildren(Math.min(9, children + 1)); }}
+                    className="w-5 h-5 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </div>
+                <div className="flex items-center gap-1">
+                  <span className="text-gray-600">Infants:</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); setInfants(Math.max(0, infants - 1)); }}
+                    className="w-5 h-5 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    -
+                  </button>
+                  <span className="w-4 text-center font-medium">{infants}</span>
+                  <button
+                    onClick={(e) => { e.preventDefault(); setInfants(Math.min(adults, infants + 1)); }}
+                    className="w-5 h-5 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                  >
+                    +
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -271,12 +343,77 @@ export default function DealCard({ deal, variant = 'default' }: DealCardProps) {
         </div>
 
         {/* Expiry Warning */}
-        {daysUntilExpiry <= 3 && (
-          <div className="mb-4 p-2 bg-yellow-50 border border-yellow-200 rounded text-xs text-yellow-800 flex items-center gap-2">
+        {expiryText && daysUntilExpiry <= 3 && (
+          <div className={`mb-4 p-2 border rounded text-xs flex items-center gap-2 ${
+            expiryUrgent 
+              ? 'bg-red-50 border-red-300 text-red-800' 
+              : 'bg-yellow-50 border-yellow-200 text-yellow-800'
+          }`}>
             <TrendingDown size={14} />
-            <span>Expires in {daysUntilExpiry} day{daysUntilExpiry !== 1 ? 's' : ''}</span>
+            <span className="font-semibold">{expiryText}</span>
           </div>
         )}
+
+        {/* Passenger Selector */}
+        <div className="mb-4 p-3 bg-gray-50 rounded-lg">
+          <div className="text-xs font-semibold text-gray-700 mb-2">Passengers</div>
+          <div className="flex gap-4 text-sm">
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600">Adults:</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => { e.preventDefault(); setAdults(Math.max(1, adults - 1)); }}
+                  className="w-6 h-6 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                >
+                  -
+                </button>
+                <span className="w-6 text-center font-medium">{adults}</span>
+                <button
+                  onClick={(e) => { e.preventDefault(); setAdults(Math.min(9, adults + 1)); }}
+                  className="w-6 h-6 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600">Children:</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => { e.preventDefault(); setChildren(Math.max(0, children - 1)); }}
+                  className="w-6 h-6 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                >
+                  -
+                </button>
+                <span className="w-6 text-center font-medium">{children}</span>
+                <button
+                  onClick={(e) => { e.preventDefault(); setChildren(Math.min(9, children + 1)); }}
+                  className="w-6 h-6 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="text-gray-600">Infants:</span>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={(e) => { e.preventDefault(); setInfants(Math.max(0, infants - 1)); }}
+                  className="w-6 h-6 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                >
+                  -
+                </button>
+                <span className="w-6 text-center font-medium">{infants}</span>
+                <button
+                  onClick={(e) => { e.preventDefault(); setInfants(Math.min(adults, infants + 1)); }}
+                  className="w-6 h-6 bg-white border border-gray-300 rounded hover:bg-gray-100 flex items-center justify-center"
+                >
+                  +
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
 
         {/* Actions */}
         <div className="flex gap-3">
