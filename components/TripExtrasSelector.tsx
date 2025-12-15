@@ -142,9 +142,13 @@ export default function TripExtrasSelector({
               <input
                 type="checkbox"
                 checked={isSelected}
-                onChange={() => {}}
-                className={`w-5 h-5 rounded ${colors.text} focus:ring-offset-0 focus:ring-2 flex-shrink-0 mt-0.5`}
-                onClick={(e) => e.stopPropagation()}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  toggleExtra(extra);
+                }}
+                className={`w-5 h-5 rounded focus:ring-offset-0 focus:ring-2 flex-shrink-0 mt-0.5`}
+                style={{ accentColor: isSelected ? colors.text.replace('text-', '#') : undefined }}
+                aria-label={`Select ${extra.name}`}
               />
             </div>
             

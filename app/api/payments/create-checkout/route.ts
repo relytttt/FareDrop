@@ -45,6 +45,8 @@ export async function POST(request: NextRequest) {
     const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000';
 
     // Build line items array - start with flight
+    // Note: All pricing including trip extras is consolidated into the flight line item
+    // for simplicity in Stripe checkout. Detailed breakdown is shown in the app UI.
     const lineItems: any[] = [
       {
         price_data: {
@@ -58,9 +60,6 @@ export async function POST(request: NextRequest) {
         quantity: 1,
       },
     ];
-
-    // Add trip extras as separate line items for transparency (already included in totalAmount)
-    // Note: These are for display purposes in Stripe checkout, the main amount is in the flight line item
     
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({

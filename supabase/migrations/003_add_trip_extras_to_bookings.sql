@@ -8,4 +8,4 @@ ADD COLUMN IF NOT EXISTS trip_extras JSONB;
 CREATE INDEX IF NOT EXISTS idx_bookings_trip_extras ON bookings USING GIN (trip_extras);
 
 -- Add comment to describe the column
-COMMENT ON COLUMN bookings.trip_extras IS 'JSON array of trip extras (car rental, insurance, eSIM) selected during booking. Each item contains: extra (TripExtra object), quantity (for per_day items), and calculatedPrice.';
+COMMENT ON COLUMN bookings.trip_extras IS 'JSONB array of SelectedExtra objects containing trip extras (car rental, insurance, eSIM) selected during booking. Structure: [{extra: TripExtra, quantity?: number, calculatedPrice: number}, ...]';
