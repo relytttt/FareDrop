@@ -70,6 +70,7 @@ export default function CheckoutPage() {
               currency={bookingData.offer.total_currency}
               passengerCount={totalPassengers}
               route={route}
+              passengers={bookingData.passengers}
             />
 
             {/* Booking Summary */}

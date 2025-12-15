@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AlertCircle, CreditCard } from 'lucide-react';
+import { PassengerDetails } from '@/lib/duffel';
 
 interface PaymentFormProps {
   offerId: string;
@@ -10,6 +11,7 @@ interface PaymentFormProps {
   currency: string;
   passengerCount: number;
   route: string;
+  passengers: PassengerDetails[];
 }
 
 export default function PaymentForm({
@@ -18,6 +20,7 @@ export default function PaymentForm({
   currency,
   passengerCount,
   route,
+  passengers,
 }: PaymentFormProps) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
@@ -40,6 +43,7 @@ export default function PaymentForm({
           route,
           totalAmount,
           currency,
+          passengers,
         }),
       });
 
