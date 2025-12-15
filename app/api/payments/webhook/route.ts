@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
 import { getServiceSupabase } from '@/lib/supabase';
 import { createOrder } from '@/lib/duffel';
+import { TRIP_EXTRAS, SelectedExtra, MinimalExtra } from '@/lib/tripExtras';
 import Stripe from 'stripe';
 
 export async function POST(request: NextRequest) {
@@ -53,7 +54,29 @@ export async function POST(request: NextRequest) {
         try {
           // Parse passengers from metadata
           const passengers = passengers_json ? JSON.parse(passengers_json) : [];
-          const tripExtras = trip_extras_json ? JSON.parse(trip_extras_json) : [];
+          
+          // Parse minimal trip extras and reconstruct full extras data
+          let tripExtras: SelectedExtra[] = [];
+          if (trip_extras_json) {
+            const minimalExtras: MinimalExtra[] = JSON.parse(trip_extras_json);
+            // Reconstruct full extras from minimal data using TRIP_EXTRAS lookup
+            const reconstructed = minimalExtras
+              .map((item: MinimalExtra): SelectedExtra | null => {
+                const extraData = TRIP_EXTRAS.find(e => e.id === item.id);
+                // Skip if extra is not found (e.g., if it was removed from the system)
+                if (!extraData) {
+                  console.warn(`Trip extra with id "${item.id}" not found in TRIP_EXTRAS`);
+                  return null;
+                }
+                return {
+                  extra: extraData,
+                  quantity: item.qty,
+                  calculatedPrice: item.price
+                };
+              })
+              .filter((item): item is SelectedExtra => item !== null);
+            tripExtras = reconstructed;
+          }
           
           if (passengers.length === 0) {
             throw new Error('No passenger data found in session metadata');

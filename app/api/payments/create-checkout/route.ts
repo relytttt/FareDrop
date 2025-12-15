@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { stripe } from '@/lib/stripe';
+import { SelectedExtra, MinimalExtra } from '@/lib/tripExtras';
 
 export async function POST(request: NextRequest) {
   try {
@@ -61,6 +62,16 @@ export async function POST(request: NextRequest) {
       },
     ];
     
+    // Create minimal trip extras data to stay under Stripe's 500 character metadata limit
+    // Only store essential data (id, quantity, price) - full details can be looked up later
+    const minimalExtras: MinimalExtra[] = tripExtras.length > 0 
+      ? tripExtras.map((item: SelectedExtra) => ({
+          id: item.extra.id,
+          qty: item.quantity || 1,
+          price: item.calculatedPrice
+        }))
+      : [];
+
     // Create Stripe Checkout Session
     const session = await stripe.checkout.sessions.create({
       payment_method_types: ['card'],
@@ -74,7 +85,7 @@ export async function POST(request: NextRequest) {
         passenger_count: passengerCount.toString(),
         route,
         passengers_json: JSON.stringify(passengers),
-        trip_extras_json: tripExtras.length > 0 ? JSON.stringify(tripExtras) : '',
+        trip_extras_json: minimalExtras.length > 0 ? JSON.stringify(minimalExtras) : '',
         user_id: userId || '',
         origin: origin || route.split(' → ')[0] || '',
         destination: destination || route.split(' → ')[1] || '',
